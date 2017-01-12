@@ -1,0 +1,4 @@
+include versioneer.py
+include python/neutronbraggedge/_version.py
+include python/neutronbraggedge/config.cfg
+include python/neutronbraggedge/data/material_list.dat
