@@ -1,4 +1,5 @@
-include versioneer.py
-include python/neutronbraggedge/_version.py
-include python/neutronbraggedge/config.cfg
-include python/neutronbraggedge/data/material_list.dat
+include README.md
+include LICENSE.txt
+
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]

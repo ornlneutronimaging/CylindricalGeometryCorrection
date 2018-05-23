@@ -1,42 +1,90 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Command
+import os
+import sys
+from shutil import rmtree
+
+import NeuNorm
+
+# to create library
+# > python setup.py upload
+
+NAME = 'cgc'
+DESCRIPTION = "Cylindrical Geometry Correction of Images"
+LONGDESCRIPTION = "See the README.md file on GitHub for more information"
+URL = "https://github.com/ornlneutronimaging/CylindricalGeometryCorrection"
+EMAIL = "bilheuxjm@ornl.gov"
+AUTHOR = "Jean Bilheux"
+VERSION = cgc.__version__
+KEYWORDS = "neutron geometry correction imaging"
+
+# what packages are required for this module to be executed
+REQUIRED = ['numpy',
+            ]
+
+here = os.path.abspath('./')
+
+class UploadCommand(Command):
+    """Support setup.py upload."""
+    description = 'Build and publish the package.'
+    user_options = []
+
+    @staticmethod
+    def status(s):
+        """Prints things in bold."""
+        print('\033[1m{0}\033[0m'.format(s))
+
+    def initialize_options(self):
+        """Initialization options."""
+        pass
+
+    def finalize_options(self):
+        """Finalize options."""
+        pass
+
+    def run(self):
+        """Remove previous builds."""
+        try:
+            self.status('Removing previous builds...')
+            rmtree(os.path.join(here, 'dist'))
+        except OSError:
+            pass
+
+        self.status('Building Source and Wheel distribution...')
+        os.system('{0} setup.py sdist bdist_wheel'.format(sys.executable))
+
+        self.status('Uploading the package to PyPI via Twine...')
+        os.system('twine upload dist/*')
+
+        sys.exit()
 
 
 setup(
-    name = "neutronbraggedge",
-    version = "1.0.1",
-    author = "Jean Bilheux",
-    author_email = "bilheuxjm@ornl.gov", 
-    packages = find_packages("python", exclude=['tests', 'notebooks']),
-    package_dir = {'': "python"},
-    #package_data = { 'python.neutronbraggedge' : ['material_list.dat']},
+    name = NAME,
+    description = DESCRIPTION ,
+    long_description = LONGDESCRIPTION,
+    url = URL,
+    version = VERSION,
+    author = AUTHOR,
+    author_email = EMAIL,
+    packages = find_packages(exclude=['tests', 'notebooks']),
     include_package_data = True,
-    data_files = [('neutronbraggedge', ['python/neutronbraggedge/config.cfg']),
-                  ('neutronbraggedge/data', ['python/neutronbraggedge/data/material_list.dat'])
-                  ],
     test_suite = 'tests',
-    install_requires = [
-        'numpy',
-        'configparser',
-#        'pandas',
-        'lxml',
-        'html5lib',
-        'beautifulsoup4',
-    ],
+    install_requires = REQUIRED,
     dependency_links = [
     ],
-    description = "Bragg Edge work at the SNS",
     license = 'BSD',
-    keywords = "neutron imaging bragg edge",
-    url = "https://github.com/ornlneutronimaging/BraggEdge",
+    keywords = KEYWORDS,
     classifiers = ['Development Status :: 3 - Alpha',
+                   'License :: OSI Approved :: BSD License',
                    'Topic :: Scientific/Engineering :: Physics',
                    'Intended Audience :: Developers',
-                   'Intended Audience :: Science/Research'
                    'Programming Language :: Python :: 2.7',
-                   'Programming Language :: Python :: 3.5'],
-    # download_url = '',
+                   'Programming Language :: Python :: 3.5',
+                   'Programming Language :: Python :: 3.6'],
+    cmdclass={
+        'upload': UploadCommand,
+    },
 )
-
 
 # End of file

@@ -1,7 +1,12 @@
 *.pyc
 *~
 .ipynb*
-/tests/BraggEdge_data_set
 /docs/_build/*
 .coverage
 /cover/*
+*.egg-info*/
+/dist/*
+/build/*
+__pycache__/*
+.DS_Store*
+.cache/*

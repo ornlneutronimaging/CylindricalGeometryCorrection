@@ -4,8 +4,8 @@ sudo: false
 language: python
 
 python:
-  - 2.7
-  - 3.4
+  - 3.5
+  - 3.6
 
 # branches:
 #   only:
@@ -27,23 +27,17 @@ after_success:
   - codecov
 
 install:
-  - export GIT_FULL_HASH=`git rev-parse HEAD`
   - conda config --set always_yes true
   - conda update conda
-  - conda create -n testenv pip nose python=$TRAVIS_PYTHON_VERSION numpy astropy scipy pandas cython
-#  - conda install -n testenv -c scikit-xray xraylib lmfit=0.8.3 netcdf4 # install from scikit-xray channel 
+  - conda create -n testenv pip nose python=$TRAVIS_PYTHON_VERSION numpy
   - source activate testenv
+  - pip install -U pytest
+  - pip install pytest-cov
+  - pip install pathlib
   - python setup.py install
-#  - pip install coveralls
-  - pip install codecov
-  - pip install rednose
-  - pip install coverage
 
 script:
-  - nosetests -v --rednose --cover-package=neutronbraggedge --with-coverage 
-#   - python tests/getdata.py
-#   - python tests/ivenus/signon.py
-#   - nosetests --exe
+  - pytest -v --cov=tests/
 
 notifications:
   email:
