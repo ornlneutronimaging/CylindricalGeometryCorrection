@@ -4,6 +4,8 @@ import os
 import sys
 from shutil import rmtree
 
+import cgc
+
 # to create library
 # > python setup.py upload
 
