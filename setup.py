@@ -4,8 +4,6 @@ import os
 import sys
 from shutil import rmtree
 
-import NeuNorm
-
 # to create library
 # > python setup.py upload
 
