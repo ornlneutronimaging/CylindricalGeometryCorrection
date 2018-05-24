@@ -20,6 +20,7 @@ KEYWORDS = "neutron geometry correction imaging"
 
 # what packages are required for this module to be executed
 REQUIRED = ['numpy',
+            'neunorm',
             ]
 
 here = os.path.abspath('./')
