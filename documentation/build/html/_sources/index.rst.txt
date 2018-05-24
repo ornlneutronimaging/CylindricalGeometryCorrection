@@ -10,6 +10,8 @@ Welcome to CylindricalGeometryCorrection's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
+   introduction
 
 
 Indices and tables

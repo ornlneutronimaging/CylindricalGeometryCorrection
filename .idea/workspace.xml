@@ -2,9 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="722306fa-f2dd-49f4-8cc8-56e150ae5f6f" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/documentation/source/installation.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/documentation/source/introduction.rst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cgc/geometry_correction.py" beforeDir="false" afterPath="$PROJECT_DIR$/cgc/geometry_correction.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/cgc/empty_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/cgc/empty_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/build/doctrees/environment.pickle" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/build/doctrees/environment.pickle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/build/doctrees/index.doctree" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/build/doctrees/index.doctree" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/build/html/.buildinfo" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/build/html/.buildinfo" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/build/html/_sources/index.rst.txt" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/build/html/_sources/index.rst.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/build/html/_static/homogeneous_cylinder_2d_view.png" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/build/html/_static/homogeneous_cylinder_2d_view.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/build/html/genindex.html" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/build/html/genindex.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/build/html/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/build/html/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/build/html/objects.inv" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/build/html/objects.inv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/build/html/search.html" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/build/html/search.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/build/html/searchindex.js" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/build/html/searchindex.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/source/_static/homogeneous_cylinder_2d_view.png" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/source/_static/homogeneous_cylinder_2d_view.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/source/_static/inhomogeneous_cylinder_2d_view.png" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/source/_static/inhomogeneous_cylinder_2d_view.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/source/conf.py" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/source/conf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documentation/source/index.rst" beforeDir="false" afterPath="$PROJECT_DIR$/documentation/source/index.rst" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,8 +44,8 @@
           <file leaf-file-name="empty_test.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="467">
-                  <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
+                <state relative-caret-position="468">
+                  <caret line="107" column="73" selection-start-line="107" selection-start-column="73" selection-end-line="107" selection-end-column="73" />
                   <folding>
                     <element signature="e#0#15#0" expanded="true" />
                   </folding>
@@ -43,14 +57,32 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="geometry_correction.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="geometry_correction.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/cgc/geometry_correction.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="547">
-                  <caret line="112" lean-forward="true" selection-start-line="112" selection-end-line="112" />
+                <state relative-caret-position="606">
+                  <caret line="120" column="13" selection-start-line="120" selection-start-column="13" selection-end-line="120" selection-end-column="13" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/README.md">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="420">
+                  <caret line="28" column="103" selection-start-line="2" selection-end-line="28" selection-end-column="103" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="introduction.rst" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/documentation/source/introduction.rst">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="450">
+                  <caret line="30" column="68" selection-start-line="30" selection-start-column="68" selection-end-line="30" selection-end-column="68" />
                 </state>
               </provider>
             </entry>
@@ -86,6 +118,10 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/cgc/geometry_correction.py" />
         <option value="$PROJECT_DIR$/tests/cgc/empty_test.py" />
+        <option value="$PROJECT_DIR$/documentation/source/conf.py" />
+        <option value="$PROJECT_DIR$/documentation/source/index.rst" />
+        <option value="$PROJECT_DIR$/documentation/source/installation.rst" />
+        <option value="$PROJECT_DIR$/documentation/source/introduction.rst" />
       </list>
     </option>
   </component>
@@ -132,13 +168,6 @@
             <path>
               <item name="CylindricalGeometryCorrection" type="b2602c69:ProjectViewProjectNode" />
               <item name="CylindricalGeometryCorrection" type="462c0819:PsiDirectoryNode" />
-              <item name="documentation" type="462c0819:PsiDirectoryNode" />
-              <item name="source" type="462c0819:PsiDirectoryNode" />
-              <item name="_static" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CylindricalGeometryCorrection" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CylindricalGeometryCorrection" type="462c0819:PsiDirectoryNode" />
               <item name="tests" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -173,6 +202,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/documentation/source" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
@@ -336,9 +366,9 @@
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" weight="0.32956383" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32956383" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32956383" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12754788" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32956383" />
+      <window_info anchor="bottom" id="Terminal" order="7" visible="true" weight="0.32956383" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12754788" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" sideWeight="0.49879518" weight="0.24984558" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
@@ -482,30 +512,65 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
+    <entry file="file://$PROJECT_DIR$/../NeuNorm/documentation/source/conf.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="81" selection-start-line="10" selection-start-column="81" selection-end-line="10" selection-end-column="81" />
+        <state relative-caret-position="528">
+          <caret line="168" column="63" lean-forward="true" selection-start-line="168" selection-start-column="63" selection-end-line="168" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/documentation/source/conf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="63">
+          <caret line="136" lean-forward="true" selection-start-line="136" selection-end-line="136" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/documentation/source/installation.rst">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/documentation/source/index.rst">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" lean-forward="true" selection-start-line="22" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="107" column="73" selection-start-line="107" selection-start-column="73" selection-end-line="107" selection-end-column="73" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cgc/geometry_correction.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="547">
-          <caret line="112" lean-forward="true" selection-start-line="112" selection-end-line="112" />
+        <state relative-caret-position="606">
+          <caret line="120" column="13" selection-start-line="120" selection-start-column="13" selection-end-line="120" selection-end-column="13" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
+    <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="467">
-          <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="420">
+          <caret line="28" column="103" selection-start-line="2" selection-end-line="28" selection-end-column="103" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/documentation/source/introduction.rst">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="30" column="68" selection-start-line="30" selection-start-column="68" selection-end-line="30" selection-end-column="68" />
         </state>
       </provider>
     </entry>
