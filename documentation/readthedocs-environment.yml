@@ -1,0 +1,10 @@
+name: NeuNorm
+channels:
+  - conda-forge
+dependencies:
+  - python==3.5
+  - sphinx>=1.5.1
+  - ipykernel
+  - sphinx_rtd_theme
+  - pip:
+    - nbsphinx
