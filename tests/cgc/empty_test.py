@@ -55,6 +55,7 @@ class TestInitialization(unittest.TestCase):
 
         ## radius1
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, radius1=-3.5)
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, radius1=-3)
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=10, radius1=20)
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, radius1=800)
@@ -66,6 +67,18 @@ class TestInitialization(unittest.TestCase):
         radius1_returned = o_cgc.radius1
         self.assertEqual(radius1_expected, radius1_returned)
 
+        ## radius2
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, radius1=50, radius2=0.5)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, radius1=50, radius2=-20)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, radius1=50, radius2=200)
+
+        # correct radius1 correctly saved
+        radius1 = 100
+        radius2_expected = 120
+        pixel_center = 250
+        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1, radius2=radius2_expected)
+        radius2_returned = o_cgc.radius2
+        self.assertEqual(radius2_expected, radius2_returned)
 
 class TestLoading(unittest.TestCase):
 

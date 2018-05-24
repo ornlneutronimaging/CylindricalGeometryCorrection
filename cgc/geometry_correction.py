@@ -96,7 +96,7 @@ class GeometryCorrection():
     def radius2(self):
         return self._radius2
 
-    @radius1.setter
+    @radius2.setter
     def radius2(self, radius2):
         if not isinstance(radius2, int):
             raise ValueError("Radius 2 must be an integer!")
@@ -106,10 +106,10 @@ class GeometryCorrection():
 
         [_, width] = np.shape(self.list_data[0])
         if (self.pixel_center - radius2) < 0:
-            raise ValueError("Cylinder defined by Radius 1 goes outside the image size (left side)!")
+            raise ValueError("Cylinder defined by Radius 2 goes outside the image size (left side)!")
 
         if (self.pixel_center + radius2) >= width:
-            raise ValueError("Cylinder defined by Radius 1 goes outside the image size (right side)!")
+            raise ValueError("Cylinder defined by Radius 2 goes outside the image size (right side)!")
 
         self._radius2 = radius2
 

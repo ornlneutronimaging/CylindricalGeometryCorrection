@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="722306fa-f2dd-49f4-8cc8-56e150ae5f6f" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.pytest_cache/v/cache/lastfailed" beforeDir="false" afterPath="$PROJECT_DIR$/.pytest_cache/v/cache/lastfailed" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cgc/geometry_correction.py" beforeDir="false" afterPath="$PROJECT_DIR$/cgc/geometry_correction.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/cgc/empty_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/cgc/empty_test.py" afterDir="false" />
     </list>
@@ -20,7 +18,7 @@
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_in_empty_test_py.coverage" NAME="py.test in empty_test.py Coverage Results" MODIFIED="1527170127366" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_for_empty_test_TestLoading_test_loading_fits_works.coverage" NAME="py.test for empty_test.TestLoading.test_loading_fits_works Coverage Results" MODIFIED="1527168395876" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_for_empty_test_TestLoading_test_loading_tiff_works.coverage" NAME="py.test for empty_test.TestLoading.test_loading_tiff_works Coverage Results" MODIFIED="1527166360783" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
-    <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_in_cgc.coverage" NAME="py.test in cgc Coverage Results" MODIFIED="1527168846086" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
+    <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_in_cgc.coverage" NAME="py.test in cgc Coverage Results" MODIFIED="1527180759290" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_in_tests.coverage" NAME="py.test in tests Coverage Results" MODIFIED="1527165188030" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_for_empty_test_TestInitialization_test_parameters_should_be_defined_after_loading_data.coverage" NAME="py.test for empty_test.TestInitialization.test_parameters_should_be_defined_after_loading_data Coverage Results" MODIFIED="1527169078153" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined.coverage" NAME="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined Coverage Results" MODIFIED="1527179573566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
@@ -32,8 +30,8 @@
           <file leaf-file-name="empty_test.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="480">
-                  <caret line="56" column="79" lean-forward="true" selection-start-line="56" selection-start-column="79" selection-end-line="56" selection-end-column="79" />
+                <state relative-caret-position="467">
+                  <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
                   <folding>
                     <element signature="e#0#15#0" expanded="true" />
                   </folding>
@@ -48,7 +46,7 @@
           <file leaf-file-name="geometry_correction.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/cgc/geometry_correction.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="723">
+                <state relative-caret-position="547">
                   <caret line="112" lean-forward="true" selection-start-line="112" selection-end-line="112" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
@@ -86,8 +84,8 @@
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/.travis.yml" />
         <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/tests/cgc/empty_test.py" />
         <option value="$PROJECT_DIR$/cgc/geometry_correction.py" />
+        <option value="$PROJECT_DIR$/tests/cgc/empty_test.py" />
       </list>
     </option>
   </component>
@@ -190,7 +188,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python tests.py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined">
+  <component name="RunManager" selected="Python tests.py.test in cgc">
     <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="CylindricalGeometryCorrection" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -275,10 +273,10 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.py.test in cgc" />
         <item itemvalue="Python tests.py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" />
         <item itemvalue="Python tests.py.test in empty_test.py" />
         <item itemvalue="Python tests.py.test for empty_test.TestInitialization.test_parameters_should_be_defined_after_loading_data" />
-        <item itemvalue="Python tests.py.test in cgc" />
         <item itemvalue="Python tests.py.test for empty_test.TestLoading.test_loading_fits_works" />
       </list>
     </recent_temporary>
@@ -297,35 +295,35 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined - 2018.05.24 at 12h 26m 40s.xml">
-      <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" configurationId="tests" />
+    <history-entry file="py_test_in_cgc - 2018.05.24 at 12h 40m 43s.xml">
+      <configuration name="py.test in cgc" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined - 2018.05.24 at 12h 27m 38s.xml">
-      <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" configurationId="tests" />
+    <history-entry file="py_test_in_cgc - 2018.05.24 at 12h 41m 28s.xml">
+      <configuration name="py.test in cgc" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined - 2018.05.24 at 12h 27m 54s.xml">
-      <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" configurationId="tests" />
+    <history-entry file="py_test_in_cgc - 2018.05.24 at 12h 41m 49s.xml">
+      <configuration name="py.test in cgc" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined - 2018.05.24 at 12h 29m 25s.xml">
-      <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" configurationId="tests" />
+    <history-entry file="py_test_in_cgc - 2018.05.24 at 12h 41m 55s.xml">
+      <configuration name="py.test in cgc" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined - 2018.05.24 at 12h 29m 59s.xml">
-      <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" configurationId="tests" />
+    <history-entry file="py_test_in_cgc - 2018.05.24 at 12h 42m 42s.xml">
+      <configuration name="py.test in cgc" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined - 2018.05.24 at 12h 30m 14s.xml">
-      <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" configurationId="tests" />
+    <history-entry file="py_test_in_cgc - 2018.05.24 at 12h 43m 06s.xml">
+      <configuration name="py.test in cgc" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined - 2018.05.24 at 12h 30m 19s.xml">
-      <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" configurationId="tests" />
+    <history-entry file="py_test_in_cgc - 2018.05.24 at 12h 43m 15s.xml">
+      <configuration name="py.test in cgc" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined - 2018.05.24 at 12h 31m 58s.xml">
-      <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" configurationId="tests" />
+    <history-entry file="py_test_in_cgc - 2018.05.24 at 12h 43m 36s.xml">
+      <configuration name="py.test in cgc" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined - 2018.05.24 at 12h 32m 14s.xml">
-      <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" configurationId="tests" />
+    <history-entry file="py_test_in_cgc - 2018.05.24 at 12h 51m 47s.xml">
+      <configuration name="py.test in cgc" configurationId="tests" />
     </history-entry>
-    <history-entry file="py_test_for_empty_test_TestInitialization_test_parameters_should_be_correctly_defined - 2018.05.24 at 12h 32m 54s.xml">
-      <configuration name="py.test for empty_test.TestInitialization.test_parameters_should_be_correctly_defined" configurationId="tests" />
+    <history-entry file="py_test_in_cgc - 2018.05.24 at 12h 52m 40s.xml">
+      <configuration name="py.test in cgc" configurationId="tests" />
     </history-entry>
   </component>
   <component name="ToolWindowManager">
@@ -491,22 +489,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
+    <entry file="file://$PROJECT_DIR$/cgc/geometry_correction.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="56" column="79" lean-forward="true" selection-start-line="56" selection-start-column="79" selection-end-line="56" selection-end-column="79" />
+        <state relative-caret-position="547">
+          <caret line="112" lean-forward="true" selection-start-line="112" selection-end-line="112" />
           <folding>
-            <element signature="e#0#15#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cgc/geometry_correction.py">
+    <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="723">
-          <caret line="112" lean-forward="true" selection-start-line="112" selection-end-line="112" />
+        <state relative-caret-position="467">
+          <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
