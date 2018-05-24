@@ -24,13 +24,11 @@ But program also work with inhomogenous sample for which the cylinder is hollow 
 
 ![image](documentation/source/_static/inhomogeneous_cylinder_2d_view.png)
 
-Program work the same and user needs to specify center and inner and outer radius of material sample.
-
+Program works the same way, user needs to specify center and inner and outer radius of material sample.
 
 # Tests
 to run the tests
 > pytest -v --cov=tests/
 
-# Documentation
 
 
