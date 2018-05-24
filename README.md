@@ -30,5 +30,6 @@ Program works the same way, user needs to specify center and inner and outer rad
 to run the tests
 > pytest -v --cov=tests/
 
-
+# Tutorial
+It's recommended to follow the notebook called **tutorial** to learn how to use the library
 
