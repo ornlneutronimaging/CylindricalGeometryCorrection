@@ -19,11 +19,6 @@ more material at the center compare to the side.
 The following figure illustrate the experimental set up and the signal measure for an homogeneous and inhomogeneous
 sample
 
-.. image:: _static/homogeneous_cylinder_2d_view.png
-
-.. image:: _static/inhomogeneous_cylinder_2d_view.png
-
-
 In order to correctly analyze data for those samples, one must cancel this cylindrical effect by "making" the sample
 flat related to the direction of the beam.
 
@@ -32,7 +27,16 @@ an image corresponding to the same sample as if it was rectangular.
 
 Such samples are called homogeneous because they are made of only one uniform and homogeneous material.
 
+.. image:: _static/homogeneous_cylinder_2d_view.png
+
 But program also work with inhomogenous sample for which the cylinder is hollow such as shown here.
 
+.. image:: _static/inhomogeneous_cylinder_2d_view.png
 
 Program works the same way, user needs to specify center and inner and outer radius of material sample.
+
+In order to run, the program only requires the user to define
+
+ * the center of the cylinder
+ * the radius of the cylinder
+ * (option) the radius of the inner cylinder
