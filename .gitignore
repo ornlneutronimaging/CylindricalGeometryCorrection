@@ -2,8 +2,6 @@
 *~
 .ipynb*
 /docs/_build/*
-.coverage
-/cover/*
 *.egg-info*/
 /dist/*
 /build/*
