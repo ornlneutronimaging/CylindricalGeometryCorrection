@@ -29,11 +29,12 @@ after_success:
 install:
   - conda config --set always_yes true
   - conda update conda
-  - conda create -n testenv pip nose python=$TRAVIS_PYTHON_VERSION numpy neunorm
+  - conda create -n testenv pip nose python=$TRAVIS_PYTHON_VERSION numpy
   - source activate testenv
   - pip install -U pytest
   - pip install pytest-cov
   - pip install pathlib
+  - pip install neunorm=1.4.0
   - python setup.py install
 
 script:

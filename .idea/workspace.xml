@@ -2,20 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="722306fa-f2dd-49f4-8cc8-56e150ae5f6f" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.pytest_cache/v/cache/lastfailed" beforeDir="false" afterPath="$PROJECT_DIR$/.pytest_cache/v/cache/lastfailed" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cgc/geometry_correction.py" beforeDir="false" afterPath="$PROJECT_DIR$/cgc/geometry_correction.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/data/homogeneous_image_px_intensity_2.fits" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/data/homogeneous_image_px_intensity_4.fits" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/data/homogeneous_image_px_intensity_6.fits" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/data/homogeneous_image_px_intensity_8.fits" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/data/inhomogeneous_image_px_intensity_2.fits" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/data/inhomogeneous_image_px_intensity_4.fits" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/data/inhomogeneous_image_px_intensity_6.fits" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/data/inhomogeneous_image_px_intensity_8.fits" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/cgc/empty_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/cgc/empty_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/tutorial.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/tutorial.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -38,8 +26,11 @@
           <file leaf-file-name="empty_test.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="45">
-                  <caret line="3" column="18" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
+                <state relative-caret-position="543">
+                  <caret line="62" column="36" selection-start-line="62" selection-start-column="36" selection-end-line="62" selection-end-column="36" />
+                  <folding>
+                    <element signature="e#0#15#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -48,14 +39,23 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="geometry_correction.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="geometry_correction.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/cgc/geometry_correction.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="705">
-                  <caret line="47" lean-forward="true" selection-start-line="47" selection-end-line="47" />
+                <state relative-caret-position="598">
+                  <caret line="40" lean-forward="true" selection-start-line="40" selection-end-line="40" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name=".travis.yml" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/.travis.yml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="490">
+                  <caret line="36" column="29" selection-start-line="36" selection-start-column="29" selection-end-line="36" selection-end-column="29" />
                 </state>
               </provider>
             </entry>
@@ -88,9 +88,9 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/setup.py" />
-        <option value="$PROJECT_DIR$/.travis.yml" />
         <option value="$PROJECT_DIR$/cgc/geometry_correction.py" />
         <option value="$PROJECT_DIR$/tests/cgc/empty_test.py" />
+        <option value="$PROJECT_DIR$/.travis.yml" />
       </list>
     </option>
   </component>
@@ -300,18 +300,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="py_test_in_tests - 2018.05.24 at 08h 17m 40s.xml">
-      <configuration name="py.test in tests" configurationId="tests" />
-    </history-entry>
-    <history-entry file="py_test_in_tests - 2018.05.24 at 08h 24m 43s.xml">
-      <configuration name="py.test in tests" configurationId="tests" />
-    </history-entry>
-    <history-entry file="py_test_in_tests - 2018.05.24 at 08h 33m 08s.xml">
-      <configuration name="py.test in tests" configurationId="tests" />
-    </history-entry>
-    <history-entry file="py_test_for_empty_test_TestLoading_test_loading_tiff_works - 2018.05.24 at 08h 33m 14s.xml">
-      <configuration name="py.test for empty_test.TestLoading.test_loading_tiff_works" configurationId="tests" />
-    </history-entry>
     <history-entry file="py_test_for_empty_test_TestLoading_test_loading_tiff_works - 2018.05.24 at 08h 36m 58s.xml">
       <configuration name="py.test for empty_test.TestLoading.test_loading_tiff_works" configurationId="tests" />
     </history-entry>
@@ -330,6 +318,18 @@
     <history-entry file="py_test_for_empty_test_TestLoading_test_loading_tiff_works - 2018.05.24 at 08h 50m 33s.xml">
       <configuration name="py.test for empty_test.TestLoading.test_loading_tiff_works" configurationId="tests" />
     </history-entry>
+    <history-entry file="py_test_for_empty_test_TestLoading_test_loading_tiff_works - 2018.05.24 at 08h 50m 48s.xml">
+      <configuration name="py.test for empty_test.TestLoading.test_loading_tiff_works" configurationId="tests" />
+    </history-entry>
+    <history-entry file="py_test_for_empty_test_TestLoading_test_loading_tiff_works - 2018.05.24 at 08h 51m 49s.xml">
+      <configuration name="py.test for empty_test.TestLoading.test_loading_tiff_works" configurationId="tests" />
+    </history-entry>
+    <history-entry file="py_test_for_empty_test_TestLoading_test_loading_tiff_works - 2018.05.24 at 08h 52m 41s.xml">
+      <configuration name="py.test for empty_test.TestLoading.test_loading_tiff_works" configurationId="tests" />
+    </history-entry>
+    <history-entry file="py_test_for_empty_test_TestLoading_test_loading_fits_works - 2018.05.24 at 08h 52m 45s.xml">
+      <configuration name="py.test for empty_test.TestLoading.test_loading_fits_works" configurationId="tests" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="51" y="23" width="3280" height="1358" extended-state="0" />
@@ -341,9 +341,9 @@
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" weight="0.32956383" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32956383" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32956383" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12754788" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32956383" />
+      <window_info anchor="bottom" id="Terminal" order="7" visible="true" weight="0.32956383" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12754788" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" sideWeight="0.49879518" weight="0.24984558" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
@@ -370,6 +370,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="390">
           <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -484,27 +487,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.travis.yml">
+    <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="415">
-          <caret line="31" column="80" selection-start-line="31" selection-start-column="80" selection-end-line="31" selection-end-column="80" />
+        <state relative-caret-position="543">
+          <caret line="62" column="36" selection-start-line="62" selection-start-column="36" selection-end-line="62" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cgc/geometry_correction.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="47" lean-forward="true" selection-start-line="47" selection-end-line="47" />
+        <state relative-caret-position="598">
+          <caret line="40" lean-forward="true" selection-start-line="40" selection-end-line="40" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
+    <entry file="file://$PROJECT_DIR$/.travis.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="18" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
+        <state relative-caret-position="490">
+          <caret line="36" column="29" selection-start-line="36" selection-start-column="29" selection-end-line="36" selection-end-column="29" />
         </state>
       </provider>
     </entry>
