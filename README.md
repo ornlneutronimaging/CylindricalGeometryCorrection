@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/ornlneutronimaging/CylindricalGeometryCorrection.svg?branch=master)](https://travis-ci.org/ornlneutronimaging/CylindricalGeometryCorrection)
+[![Documentation Status](https://readthedocs.org/projects/cylindricalgeometrycorrection/badge/?version=latest)](https://cylindricalgeometrycorrection.readthedocs.io/en/latest/?badge=latest)
 
 # Cylindrical Geometry Correction
 This library produces an image (tiff or fits) with the cylindrical geometry corrected (hollow sample or not).
