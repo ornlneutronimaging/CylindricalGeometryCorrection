@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 from NeuNorm.normalization import Normalization
 
@@ -8,16 +9,32 @@ class GeometryCorrection():
     list_files = []
     list_data = []
 
+    step1 = False # load
+    step2 = False # parameters definition
+
     def __init__(self, list_files=[]):
         self.list_files = list_files
 
-    def run(self, notebook=False):
+    def run(self, notebook=False, pixel_center=np.NaN, radius1=np.NaN, radius2=np.NaN):
         '''run the full process without having to call the steps one by one
 
         Parameters:
             notebook: boolean - to display or not a progress bar when loading the file via notebook (default True)
+            pixel_center: int - center of cylinder (default np.NaN)
+            radius1: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.NaN)
+            radius2: int - radius of outer cylinder (default is np.NaN)
+
+        Raises:
+            ValueError if pixel_center is not >0 int
+            ValueError if radius1 is not >0 int
+            ValueError if radius2 is not >0 int (unless np.NaN)
+            ValueError if pixel_center outside image size
+            ValueError if radius1 define cylinder outside image
+            ValueError if radius2 define cylinder outside image
+
         '''
         self.load_files(notebook=notebook)
+        self.define_parameters(pixel_center=pixel_center, radius1=radius1, radius2=radius2)
 
     @property
     def list_files(self):
@@ -36,8 +53,72 @@ class GeometryCorrection():
 
         self._list_files = list_files
 
+    @property
+    def pixel_center(self):
+        return self._pixel_center
+
+    @pixel_center.setter
+    def pixel_center(self, pixel_center):
+        if self.step1 is False:
+            raise AttributeError("Please define the list of files first by running the 'load_files' method!")
+
+        if not isinstance(pixel_center, int):
+            raise ValueError("Pixel center must be an integer!")
+
+        [_, width] = np.shape(self.list_data[0])
+        if (pixel_center <= 0) or (pixel_center >= width):
+            raise ValueError("Pixel center must be inside the image!")
+
+        self._pixel_center = pixel_center
+
+    @property
+    def radius1(self):
+        return self._radius1
+
+    @radius1.setter
+    def radius1(self, radius1):
+        if not isinstance(radius1, int):
+            raise ValueError("Radius 1 must be an integer!")
+
+        if radius1 <= 0:
+            raise ValueError("Radius 1 must be greater than 0!")
+
+        [_, width] = np.shape(self.list_data[0])
+        if (self.pixel_center - radius1) < 0:
+            raise ValueError("Cylinder defined by Radius 1 goes outside the image size (left side)!")
+
+        if (self.pixel_center + radius1) >= width:
+            raise ValueError("Cylinder defined by Radius 1 goes outside the image size (right side)!")
+
+        self._radius1 = radius1
+
+    @property
+    def radius2(self):
+        return self._radius2
+
+    @radius1.setter
+    def radius2(self, radius2):
+        if not isinstance(radius2, int):
+            raise ValueError("Radius 2 must be an integer!")
+
+        if radius2 <= 0:
+            raise ValueError("Radius 2 must be greater than 0!")
+
+        [_, width] = np.shape(self.list_data[0])
+        if (self.pixel_center - radius2) < 0:
+            raise ValueError("Cylinder defined by Radius 1 goes outside the image size (left side)!")
+
+        if (self.pixel_center + radius2) >= width:
+            raise ValueError("Cylinder defined by Radius 1 goes outside the image size (right side)!")
+
+        self._radius2 = radius2
+
+    # general method
+
     def load_files(self, notebook=False):
         """loading the tiff or fits images
+
+        step1
 
         Parameters:
             notebook: boolean - to display or not a progress bar when loading the file via notebook (default True)
@@ -45,4 +126,28 @@ class GeometryCorrection():
         o_norm = Normalization()
         o_norm.load(file=self.list_files, notebook=notebook)
         self.list_data = o_norm.data['sample']['data']
+        self.step1 = True
 
+    def define_parameters(self, pixel_center=np.NaN, radius1=np.NaN, radius2=np.NaN):
+        '''define the center of the cylinder and the radius 1 and optionally 2 if working with inhomogeneous sample
+
+        step2
+
+        Parameters:
+            pixel_center: int - center of cylinder in the horizontal direction. Algorithm consider that the
+                vertical axis is symmetrical (default np.NaN)
+            radius1: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.NaN)
+            radius2: int - radius of outer cylinder (default is np.NaN)
+
+        Raises:
+            ValueError if pixel_center is not >0 int
+            ValueError if radius1 is not >0 int
+            ValueError if radius2 is not >0 int (unless np.NaN)
+            ValueError if pixel_center outside image size
+            ValueError if radius1 define cylinder outside image
+            ValueError if radius2 define cylinder outside image
+        '''
+        self.pixel_center = pixel_center
+        self.radius1 = radius1
+        if not np.isnan(radius2):
+            self.radius2 = radius2

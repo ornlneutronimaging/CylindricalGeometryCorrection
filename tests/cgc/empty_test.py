@@ -29,6 +29,43 @@ class TestInitialization(unittest.TestCase):
         list_files_returned = o_cgc.list_files
         self.assertTrue(list_files == list_files_returned)
 
+    def test_parameters_should_be_defined_after_loading_data(self):
+        '''assert center and radius are defined after loading the data'''
+        list_tiff = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
+        o_cgc = GeometryCorrection(list_files=list_tiff)
+        self.assertRaises(AttributeError, o_cgc.define_parameters, pixel_center=10)
+
+    def test_parameters_should_be_correctly_defined(self):
+        '''assert pixel_center, radius1 and radius2 (if defined) have correct format'''
+        list_tiff = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
+        o_cgc = GeometryCorrection(list_files=list_tiff)
+
+        ## pixel
+        # pixel center should be integer, >0 and withing the image size
+        o_cgc.load_files()
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=2.5)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=-3)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=600)
+
+        # pixel in right range correctly saved
+        pixel_center_expected = 50
+        o_cgc.define_parameters(pixel_center=pixel_center_expected, radius1=10)
+        pixel_center_returned = o_cgc.pixel_center
+        self.assertEqual(pixel_center_expected, pixel_center_returned)
+
+        ## radius1
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, radius1=-3)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=10, radius1=20)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, radius1=800)
+
+        # correct radius1 correctly saved
+        radius1_expected = 100
+        pixel_center = 250
+        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1_expected)
+        radius1_returned = o_cgc.radius1
+        self.assertEqual(radius1_expected, radius1_returned)
+
 
 class TestLoading(unittest.TestCase):
 
