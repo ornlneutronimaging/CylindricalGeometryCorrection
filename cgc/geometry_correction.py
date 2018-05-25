@@ -12,6 +12,9 @@ class GeometryCorrection():
     step1 = False # load
     step2 = False # parameters definition
 
+    _radius1 = np.NaN
+    _radius2 = np.NaN
+
     def __init__(self, list_files=[]):
         self.list_files = list_files
 
@@ -159,8 +162,10 @@ class GeometryCorrection():
         """Depending on if we are working with homogeneous or inhomogeneous samples, this algorithm calculates the
         sample thickness. For an homogeneous sample, it's simply 2 times the radius1. For an inhomogenous sample,
         the sample thickness is 2 times (radius_outer_cylinder - radius_inner_cylinder)"""
-        return np.NaN
-
+        if np.isnan(self.radius2):
+            return 2 * self.radius1
+        else:
+            return 2 * (self.radius2 - self.radius1)
 
     def calculate_pixel_intensity(self, slice=[]):
         """return the intensity of each pixel by using the radius and pixel_center info

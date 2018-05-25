@@ -131,3 +131,32 @@ class TestLoading(unittest.TestCase):
         self.assertTrue(height_expected, height_loaded)
         self.assertTrue(width_expected, width_loaded)
 
+
+class testCorrection(unittest.TestCase):
+
+    def setUp(self):
+        _file_path = os.path.dirname(__file__)
+        self.data_path = os.path.abspath(os.path.join(_file_path, "../../notebooks/data/"))
+
+    def test_calculate_sample_thickness(self):
+        """assert calculation of thickness is correct for homo and inhomogeneous"""
+        radius1 = 50
+        pixel_center = 100
+
+        list_fits = glob.glob(self.data_path + '/fits/homogeneous*.fits')
+        o_cgc = GeometryCorrection(list_files=list_fits)
+        o_cgc.load_files()
+
+        # homogeneous sample
+        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1)
+        thickness_calculated = o_cgc.get_sample_thickness_at_center()
+        thickness_expected = 100
+        self.assertEqual(thickness_calculated, thickness_expected)
+
+        # inhomogeneous sample
+        radius2 = 70
+        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1, radius2=radius2)
+        thickness_calculated = o_cgc.get_sample_thickness_at_center()
+        thickness_expected = 40
+        self.assertEqual(thickness_calculated, thickness_expected)
+
