@@ -111,7 +111,10 @@ class GeometryCorrection():
         if (self.pixel_center + radius2) >= width:
             raise ValueError("Cylinder defined by Radius 2 goes outside the image size (right side)!")
 
-        self._radius2 = radius2
+        if self._radius1 > radius2:
+            self._radius1, self._radius2 = radius2, self._radius1
+        else:
+            self._radius2 = radius2
 
     # general method
 
@@ -152,6 +155,43 @@ class GeometryCorrection():
         if not np.isnan(radius2):
             self.radius2 = radius2
 
+    def get_sample_thickness_at_center(self):
+        """Depending on if we are working with homogeneous or inhomogeneous samples, this algorithm calculates the
+        sample thickness. For an homogeneous sample, it's simply 2 times the radius1. For an inhomogenous sample,
+        the sample thickness is 2 times (radius_outer_cylinder - radius_inner_cylinder)"""
+        return np.NaN
+
+
+    def calculate_pixel_intensity(self, slice=[]):
+        """return the intensity of each pixel by using the radius and pixel_center info
+
+        pixel_intensity is simply the value of the slice at the center position divided by the diameter
+
+        Parameters:
+            slice: array - slice of the image
+
+        Returns:
+            the pixel intensity value
+        """
+        _effective_diameter = self.get_sample_thickness_at_center()
+        return np.NaN
+
+
+
+    def _correct_file_index(self, index=0):
+        """main agorithm that correct geometry of file index specified
+
+        Parameters:
+            index: int - file index (default 0, first file)
+        """
+        _image = self.list_data[index]
+        [height, width] = np.shape(_image)
+        for _slice_index in np.arange(height):
+            _slice = _image[_slice, :]
+            _pixel_intensity = self.calculate_pixel_intensity(slice=_slice)
+
+
+
     def correct(self, notebook=False):
         """main algorithm that is going to correct the cylindrical geometry
 
@@ -159,7 +199,6 @@ class GeometryCorrection():
             notebook: boolean - display or not progress bar showing progress of correction (default False)
 
         """
-
         if notebook:
             from ipywidgets import widgets
             from IPython.core.display import display
@@ -169,9 +208,7 @@ class GeometryCorrection():
             display(progress_ui)
 
         for _index, _file in enumerate(self.list_data):
-
-
-
+            self._correct_file_index(_index)
 
             if notebook:
                 progress_ui.value = _index + 1

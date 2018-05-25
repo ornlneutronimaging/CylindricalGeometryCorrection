@@ -80,6 +80,17 @@ class TestInitialization(unittest.TestCase):
         radius2_returned = o_cgc.radius2
         self.assertEqual(radius2_expected, radius2_returned)
 
+        # make sure program sort the radius1 and 2 (radius1 < radius2)
+        radius1 = 150
+        radius2 = 100
+        pixel_center = 250
+        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1, radius2=radius2)
+        radius1_saved = o_cgc.radius1
+        radius2_saved = o_cgc.radius2
+        self.assertEqual(radius1_saved, radius2)
+        self.assertEqual(radius2_saved, radius1)
+
+
 class TestLoading(unittest.TestCase):
 
     def setUp(self):
