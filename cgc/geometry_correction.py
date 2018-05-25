@@ -93,7 +93,13 @@ class GeometryCorrection():
         if (self.pixel_center + radius1) >= width:
             raise ValueError("Cylinder defined by Radius 1 goes outside the image size (right side)!")
 
-        self._radius1 = radius1
+        if np.isnan(self._radius2):
+            self._radius1 = radius1
+        else:
+            if self._radius2 > radius1:
+                self._radius1, self._radius2 = self._radius2, radius1
+            else:
+                self._radius1 = radius1
 
     @property
     def radius2(self):
@@ -115,9 +121,9 @@ class GeometryCorrection():
             raise ValueError("Cylinder defined by Radius 2 goes outside the image size (right side)!")
 
         if self._radius1 > radius2:
-            self._radius1, self._radius2 = radius2, self._radius1
-        else:
             self._radius2 = radius2
+        else:
+            self._radius1, self._radius2 = radius2, self._radius1
 
     # general method
 
@@ -165,7 +171,7 @@ class GeometryCorrection():
         if np.isnan(self.radius2):
             return 2 * self.radius1
         else:
-            return 2 * (self.radius2 - self.radius1)
+            return 2 * (self.radius1 - self.radius2)
 
     def calculate_pixel_intensity(self, slice=[]):
         """return the intensity of each pixel by using the radius and pixel_center info
@@ -213,12 +219,11 @@ class GeometryCorrection():
         """
         _image = self.list_data[index]
         _crop_image = self.isolate_cylinder_from_image(index=index)
+
         [height, width] = np.shape(_image)
         for _slice_index in np.arange(height):
             _slice = _image[_slice, :]
             _pixel_intensity = self.calculate_pixel_intensity(slice=_slice)
-
-
 
     def correct(self, notebook=False):
         """main algorithm that is going to correct the cylindrical geometry
@@ -235,6 +240,7 @@ class GeometryCorrection():
                                               description = 'Progress:')
             display(progress_ui)
 
+        self.calculate_outer_radius()
         for _index, _file in enumerate(self.list_data):
             self._correct_file_index(_index)
 

@@ -50,10 +50,8 @@ class TestInitialization(unittest.TestCase):
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=600)
 
         # pixel in right range correctly saved
-        pixel_center_expected = 50
-        o_cgc.define_parameters(pixel_center=pixel_center_expected, radius1=10)
-        pixel_center_returned = o_cgc.pixel_center
-        self.assertEqual(pixel_center_expected, pixel_center_returned)
+        o_cgc.define_parameters(pixel_center=50, radius1=10)
+        self.assertEqual(50, o_cgc.pixel_center)
 
         ## radius1
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50)
@@ -63,11 +61,8 @@ class TestInitialization(unittest.TestCase):
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, radius1=800)
 
         # correct radius1 correctly saved
-        radius1_expected = 100
-        pixel_center = 250
-        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1_expected)
-        radius1_returned = o_cgc.radius1
-        self.assertEqual(radius1_expected, radius1_returned)
+        o_cgc.define_parameters(pixel_center=250, radius1=100)
+        self.assertEqual(100, o_cgc.radius1)
 
         ## radius2
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, radius1=50, radius2=0.5)
@@ -75,22 +70,22 @@ class TestInitialization(unittest.TestCase):
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, radius1=50, radius2=200)
 
         # correct radius1 correctly saved
-        radius1 = 100
-        radius2_expected = 120
-        pixel_center = 250
-        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1, radius2=radius2_expected)
-        radius2_returned = o_cgc.radius2
-        self.assertEqual(radius2_expected, radius2_returned)
+        o_cgc.define_parameters(pixel_center=250, radius1=120, radius2=100)
+        self.assertEqual(100, o_cgc.radius2)
+        self.assertEqual(120, o_cgc.radius1)
 
-        # make sure program sort the radius1 and 2 (radius1 < radius2)
-        radius1 = 150
-        radius2 = 100
-        pixel_center = 250
-        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1, radius2=radius2)
-        radius1_saved = o_cgc.radius1
-        radius2_saved = o_cgc.radius2
-        self.assertEqual(radius1_saved, radius2)
-        self.assertEqual(radius2_saved, radius1)
+        # correct radius1 correctly saved when no radius2
+        o_cgc = GeometryCorrection(list_files=list_tiff)
+        o_cgc.load_files()
+        o_cgc.define_parameters(pixel_center=250, radius1=120)
+        self.assertEqual(120, o_cgc.radius1)
+
+        # make sure program sort the radius1 and 2 (radius1 being always the outside radius)
+        o_cgc = GeometryCorrection(list_files=list_tiff)
+        o_cgc.load_files()
+        o_cgc.define_parameters(pixel_center=250, radius1=100, radius2=150)
+        self.assertEqual(o_cgc.radius1, 150)
+        self.assertEqual(o_cgc.radius2, 100)
 
 
 class TestLoading(unittest.TestCase):
@@ -142,40 +137,30 @@ class testCorrection(unittest.TestCase):
 
     def test_calculate_sample_thickness(self):
         """assert calculation of thickness is correct for homo and inhomogeneous"""
-        radius1 = 50
-        pixel_center = 100
 
         list_fits = glob.glob(self.data_path + '/fits/homogeneous*.fits')
         o_cgc = GeometryCorrection(list_files=list_fits)
         o_cgc.load_files()
 
         # homogeneous sample
-        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1)
-        thickness_calculated = o_cgc.get_sample_thickness_at_center()
-        thickness_expected = 100
-        self.assertEqual(thickness_calculated, thickness_expected)
+        o_cgc.define_parameters(pixel_center=100, radius1=50)
+        self.assertEqual(o_cgc.get_sample_thickness_at_center(), 100)
 
         # inhomogeneous sample
-        radius2 = 70
-        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1, radius2=radius2)
-        thickness_calculated = o_cgc.get_sample_thickness_at_center()
-        thickness_expected = 40
-        self.assertEqual(thickness_calculated, thickness_expected)
+        o_cgc.define_parameters(pixel_center=100, radius1=50, radius2=70)
+        self.assertEqual(o_cgc.get_sample_thickness_at_center(), 40)
 
     def test_calculate_pixel_intensity(self):
         """assert calculation of pixel_intensity works"""
         list_fits = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
         o_cgc = GeometryCorrection(list_files=list_fits)
         o_cgc.load_files()
-        radius1 = 200
-        pixel_center = 256
-        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1)
+        o_cgc.define_parameters(pixel_center=256, radius1=200)
         _image_0 = o_cgc.list_data[0]
         _slice_50 = _image_0[50, :]
-        calculated_pixel_intensity = o_cgc.calculate_pixel_intensity(slice=_slice_50)
-        expected_pixel_intensity = 2.00
-        self.assertAlmostEqual(expected_pixel_intensity,
-                                calculated_pixel_intensity, delta=ERR_OFFSET)
+        self.assertAlmostEqual(2.00,
+                               o_cgc.calculate_pixel_intensity(slice=_slice_50),
+                               delta=ERR_OFFSET)
 
     def test_isolate_cylinder_from_iamge(self):
         """assert isolation of cylinder works for homogeneous and inhomogeneous"""
