@@ -178,10 +178,32 @@ class GeometryCorrection():
         Returns:
             the pixel intensity value
         """
+        if slice == []:
+            raise ValueError("Slice is empty!")
+
         _effective_diameter = self.get_sample_thickness_at_center()
-        return np.NaN
+        return slice[self.pixel_center] / _effective_diameter
 
+    def isolate_cylinder_from_image(self, index=0):
+        """Isolate the cylinder from the rest of the image
 
+        Parameters:
+              index: int - file index (default 0, first file)
+
+        Returns:
+              image cropped using pixel center and radius information
+        """
+        _image = self.list_data[index]
+        _pixel_center = self.pixel_center
+        _radius1 = self.radius1
+        _radius2 = self.radius2
+
+        if np.isnan(_radius2):
+            _outer_radius = _radius1
+        else:
+            _outer_radius = _radius2
+
+        return _image[: , _pixel_center - _outer_radius : _pixel_center + _outer_radius + 1]
 
     def _correct_file_index(self, index=0):
         """main agorithm that correct geometry of file index specified
@@ -190,6 +212,7 @@ class GeometryCorrection():
             index: int - file index (default 0, first file)
         """
         _image = self.list_data[index]
+        _crop_image = self.isolate_cylinder_from_image(index=index)
         [height, width] = np.shape(_image)
         for _slice_index in np.arange(height):
             _slice = _image[_slice, :]

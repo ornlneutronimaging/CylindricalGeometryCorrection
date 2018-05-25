@@ -5,6 +5,8 @@ import numpy as np
 
 from cgc.geometry_correction import GeometryCorrection
 
+ERR_OFFSET = 0.01
+
 
 class TestInitialization(unittest.TestCase):
 
@@ -159,4 +161,34 @@ class testCorrection(unittest.TestCase):
         thickness_calculated = o_cgc.get_sample_thickness_at_center()
         thickness_expected = 40
         self.assertEqual(thickness_calculated, thickness_expected)
+
+    def test_calculate_pixel_intensity(self):
+        """assert calculation of pixel_intensity works"""
+        list_fits = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
+        o_cgc = GeometryCorrection(list_files=list_fits)
+        o_cgc.load_files()
+        radius1 = 200
+        pixel_center = 256
+        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius1)
+        _image_0 = o_cgc.list_data[0]
+        _slice_50 = _image_0[50, :]
+        calculated_pixel_intensity = o_cgc.calculate_pixel_intensity(slice=_slice_50)
+        expected_pixel_intensity = 2.00
+        self.assertAlmostEqual(expected_pixel_intensity,
+                                calculated_pixel_intensity, delta=ERR_OFFSET)
+
+    def test_isolate_cylinder_from_iamge(self):
+        """assert isolation of cylinder works for homogeneous and inhomogeneous"""
+        list_tiff = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
+        o_cgc = GeometryCorrection(list_files=list_tiff)
+        o_cgc.load_files()
+        pixel_center = 256
+        radius = 200
+        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius)
+        _isolated_cylinder_calculated = o_cgc.isolate_cylinder_from_image(index=0)
+
+        # what we expect
+        image_0 = o_cgc.list_data[0]
+        _isolated_cylinder_expected = image_0[:, pixel_center-radius:pixel_center+radius+1]
+        self.assertTrue((_isolated_cylinder_calculated == _isolated_cylinder_expected).all())
 
