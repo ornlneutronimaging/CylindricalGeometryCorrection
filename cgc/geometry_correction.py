@@ -8,6 +8,7 @@ class GeometryCorrection():
 
     list_files = []
     list_data = []
+    list_data_corrected = []
 
     step1 = False # load
     step2 = False # parameters definition
@@ -221,9 +222,17 @@ class GeometryCorrection():
         _crop_image = self.isolate_cylinder_from_image(index=index)
 
         [height, width] = np.shape(_image)
+        corrected_image = np.zeros((height, width))
         for _slice_index in np.arange(height):
-            _slice = _image[_slice, :]
-            _pixel_intensity = self.calculate_pixel_intensity(slice=_slice)
+            _slice = _image[_slice_index, :]
+            # _pixel_intensity = self.calculate_pixel_intensity(slice=_slice)
+            for _index_pixel, _pixel in enumerate(np.arange(-self.radius1, self.radius1+1)):
+                _intensity_of_pixel = _slice[_index_pixel]
+                _coeff = self.general_correction(x=_pixel)
+                _corrected_value = (_intensity_of_pixel * _coeff ) / 2.0
+                corrected_image[_slice_index, _index_pixel] = _corrected_value
+
+        return corrected_image
 
     def correct(self, notebook=False):
         """main algorithm that is going to correct the cylindrical geometry
@@ -240,12 +249,41 @@ class GeometryCorrection():
                                               description = 'Progress:')
             display(progress_ui)
 
-        self.calculate_outer_radius()
+        self.list_data_correctd = []
         for _index, _file in enumerate(self.list_data):
-            self._correct_file_index(_index)
+            self.list_data_corrected.append(self._correct_file_index(_index))
 
             if notebook:
                 progress_ui.value = _index + 1
 
         if notebook:
             progress_ui.close()
+
+    def general_correction(self, x=0):
+        if np.isnan(self._radius2):
+            return GeometryCorrection.homogeneous_correction(x=x, radius=self._radius1)
+        else:
+            return GeometryCorrection.inhomogeneous_correction(x=x, inner_radius=self._radius2,
+                                                               outer_radius=self._radius1)
+
+    @staticmethod
+    def homogeneous_correction(x=0, radius=np.NaN):
+        if np.abs(x) > radius:
+            return 0
+        rp = 2 * radius * np.sin(np.arccos(x / radius))
+        if x == 0:
+            return 1
+        return (2 * radius) / rp
+
+    @staticmethod
+    def inhomogeneous_correction(x=0, inner_radius=np.NaN, outer_radius=np.NaN):
+        r = np.abs(x)
+        if r >= outer_radius:
+            return 0
+        elif (r >= inner_radius) and (r <= outer_radius):
+            return 2 * outer_radius * np.sin(np.arccos(x / outer_radius))
+        else:
+            rp1 = 2 * inner_radius * np.sin(np.arccos(x / inner_radius))
+            rp2 = 2 * outer_radius * np.sin(np.arccos(x / outer_radius))
+            rp = rp2 - rp1
+            return rp
