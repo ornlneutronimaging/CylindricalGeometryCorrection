@@ -151,3 +151,30 @@ class GeometryCorrection():
         self.radius1 = radius1
         if not np.isnan(radius2):
             self.radius2 = radius2
+
+    def correct(self, notebook=False):
+        """main algorithm that is going to correct the cylindrical geometry
+
+        Parameters:
+            notebook: boolean - display or not progress bar showing progress of correction (default False)
+
+        """
+
+        if notebook:
+            from ipywidgets import widgets
+            from IPython.core.display import display
+
+            progress_ui = widgets.IntProgress(max=len(self.list_files),
+                                              description = 'Progress:')
+            display(progress_ui)
+
+        for _index, _file in enumerate(self.list_data):
+
+
+
+
+            if notebook:
+                progress_ui.value = _index + 1
+
+        if notebook:
+            progress_ui.close()
