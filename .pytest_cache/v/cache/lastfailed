@@ -1,1 +1,4 @@
-{}
+{
+  "tests/cgc/empty_test.py::TestInitialization": true,
+  "tests/cgc/empty_test.py::TestLoading": true
+}
