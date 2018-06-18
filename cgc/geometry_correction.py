@@ -140,6 +140,7 @@ class GeometryCorrection():
         o_norm.load(file=self.list_files, notebook=notebook)
         self.list_data = o_norm.data['sample']['data']
         self.step1 = True
+        del o_norm
 
     def define_parameters(self, pixel_center=np.NaN, radius1=np.NaN, radius2=np.NaN):
         '''define the center of the cylinder and the radius 1 and optionally 2 if working with inhomogeneous sample
@@ -257,7 +258,7 @@ class GeometryCorrection():
                                               description = 'Progress:')
             display(progress_ui)
 
-        self.list_data_correctd = []
+        self.list_data_corrected = []
         for _index, _file in enumerate(self.list_data):
             self.list_data_corrected.append(self._correct_file_index(_index))
 
