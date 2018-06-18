@@ -217,9 +217,13 @@ class GeometryCorrection():
 
         Parameters:
             index: int - file index (default 0, first file)
+
+        Returns:
+            2D of image corrected
+
         """
-        _image = self.list_data[index]
-        _crop_image = self.isolate_cylinder_from_image(index=index)
+        # _image = self.list_data[index]
+        _image = self.isolate_cylinder_from_image(index=index)
 
         [height, width] = np.shape(_image)
         corrected_image = np.zeros((height, width))
@@ -232,7 +236,11 @@ class GeometryCorrection():
                 _corrected_value = (_intensity_of_pixel * _coeff ) / 2.0
                 corrected_image[_slice_index, _index_pixel] = _corrected_value
 
-        return corrected_image
+        # remove first pixel
+        corrected_image = corrected_image[:, 1:]
+        absolute_radius = self.get_sample_thickness_at_center()/2
+
+        return corrected_image/absolute_radius
 
     def correct(self, notebook=False):
         """main algorithm that is going to correct the cylindrical geometry
@@ -273,6 +281,8 @@ class GeometryCorrection():
         rp = 2 * radius * np.sin(np.arccos(x / radius))
         if x == 0:
             return 1
+        if rp == 0:
+            return np.NaN
         return (2 * radius) / rp
 
     @staticmethod

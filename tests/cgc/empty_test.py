@@ -129,7 +129,7 @@ class TestLoading(unittest.TestCase):
         self.assertTrue(width_expected, width_loaded)
 
 
-class testCorrection(unittest.TestCase):
+class testHomogeneousCorrection(unittest.TestCase):
 
     def setUp(self):
         _file_path = os.path.dirname(__file__)
@@ -162,7 +162,7 @@ class testCorrection(unittest.TestCase):
                                o_cgc.calculate_pixel_intensity(slice=_slice_50),
                                delta=ERR_OFFSET)
 
-    def test_isolate_cylinder_from_iamge(self):
+    def test_isolate_cylinder_from_image(self):
         """assert isolation of cylinder works for homogeneous and inhomogeneous"""
         list_tiff = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
         o_cgc = GeometryCorrection(list_files=list_tiff)
