@@ -237,7 +237,7 @@ class GeometryCorrection():
                 corrected_image[_slice_index, _index_pixel] = _corrected_value
 
         # remove first pixel
-        corrected_image = corrected_image[:, 1:]
+        corrected_image = corrected_image[:, 1:-1]
         absolute_radius = self.get_sample_thickness_at_center()/2
 
         return corrected_image/absolute_radius

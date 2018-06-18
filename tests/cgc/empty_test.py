@@ -177,3 +177,33 @@ class testHomogeneousCorrection(unittest.TestCase):
         _isolated_cylinder_expected = image_0[:, pixel_center-radius:pixel_center+radius+1]
         self.assertTrue((_isolated_cylinder_calculated == _isolated_cylinder_expected).all())
 
+    def test_correction_intensity_2(self):
+        """assert the correction works"""
+        tiff_image = glob.glob(self.data_path + '/tiff/homogeneous_image_px_intensity_2.tif')
+        o_cgc = GeometryCorrection(list_files=tiff_image)
+        o_cgc.load_files()
+        pixel_center = 256
+        radius = 200
+        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius)
+        o_cgc.correct()
+        first_image_corrected = o_cgc.list_data_corrected[0]
+        row_10_returned = first_image_corrected[10, :]
+        row_10_expected = np.ones(400)*2
+        for _returned, _expected in zip(row_10_returned, row_10_expected):
+            self.assertAlmostEqual(_returned, _expected, delta=0.1)
+
+    def test_correction_intensity_4(self):
+        """assert the correction works"""
+        tiff_image = glob.glob(self.data_path + '/tiff/homogeneous_image_px_intensity_4.tif')
+        o_cgc = GeometryCorrection(list_files=tiff_image)
+        o_cgc.load_files()
+        pixel_center = 256
+        radius = 200
+        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius)
+        o_cgc.correct()
+        first_image_corrected = o_cgc.list_data_corrected[0]
+        row_10_returned = first_image_corrected[10, :]
+        row_10_expected = np.ones(400)*4
+        for _returned, _expected in zip(row_10_returned, row_10_expected):
+            self.assertAlmostEqual(_returned, _expected, delta=0.1)
+

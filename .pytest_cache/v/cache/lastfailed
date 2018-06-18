@@ -1,1 +1,3 @@
-{}
+{
+  "tests/cgc/empty_test.py": true
+}
