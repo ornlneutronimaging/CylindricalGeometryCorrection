@@ -36,6 +36,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="CylindricalGeometryCorrection 0.0.1 documentation" href="index.html"/>
+        <link rel="next" title="Tutorial" href="tutorial.html"/>
         <link rel="prev" title="Installation" href="installation.html"/> 
 
   
@@ -94,8 +95,14 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#principle">Principle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#algorithm">Algorithm</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#homogeous-cylinder">Homogeous Cylinder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inhomogeous-cylinder">Inhomogeous Cylinder</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 </ul>
 
             
@@ -215,15 +222,62 @@ an image corresponding to the same sample as if it was rectangular.</p>
 <img alt="_images/homogeneous_cylinder_2d_view.png" src="_images/homogeneous_cylinder_2d_view.png" />
 <p>But program also work with inhomogenous sample for which the cylinder is hollow such as shown here.</p>
 <img alt="_images/inhomogeneous_cylinder_2d_view.png" src="_images/inhomogeneous_cylinder_2d_view.png" />
-<p>Program works the same way, user needs to specify center and inner and outer radius of material sample.</p>
+<p>Program works the same way, user needs to specify center, inner and outer radius of material sample.</p>
 <p>In order to run, the program only requires the user to define</p>
 <blockquote>
 <div><ul class="simple">
-<li>the center of the cylinder</li>
-<li>the radius of the cylinder</li>
-<li>(option) the radius of the inner cylinder</li>
+<li>the center of the cylinder(s)</li>
+<li>the radius(dii) of the cylinder(s)</li>
 </ul>
 </div></blockquote>
+</div>
+<div class="section" id="algorithm">
+<h2>Algorithm<a class="headerlink" href="#algorithm" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="homogeous-cylinder">
+<h3>Homogeous Cylinder<a class="headerlink" href="#homogeous-cylinder" title="Permalink to this headline">¶</a></h3>
+<p>Let’s consider a cylinder of radius <strong>r1</strong> center around the x-axis.</p>
+<img alt="_images/homogeneous_cylinder.png" src="_images/homogeneous_cylinder.png" />
+<p>the neutron beam is hitting the sample from the bottom side. The goal of the algorithm is to evaluate the effective
+thickness of the sample (2*rp) exposed to the beam. Once we know this thickness, we can correct for it in the final
+calculation to make the sample “flat”.</p>
+<div class="math">
+\[r_p = 2 * r_1 * sin(arcos(d/r_1))\]</div>
+<p>we can then define the correction factor as such</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>   <span class="c1"># center of the cylinder</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="n">r_p</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="inhomogeous-cylinder">
+<h3>Inhomogeous Cylinder<a class="headerlink" href="#inhomogeous-cylinder" title="Permalink to this headline">¶</a></h3>
+<p>In this case, we have a hollow cylinder. Inner radius is <strong>r1</strong> and outer radius is <strong>r2</strong>. Once again, we consider
+the cylinder being center around the x-axis and beam is coming from the bottom.</p>
+<img alt="_images/inhomogeneous_cylinder.png" src="_images/inhomogeneous_cylinder.png" />
+<p>Just like the homogenous case, we need to calculate the effective sample thickness (2*rp) exposed to the beam.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">_d</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">r2</span><span class="p">:</span>
+    <span class="n">rp</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">elif</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">_d</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">r1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">_d</span><span class="p">)</span><span class="o">&lt;=</span><span class="n">r2</span><span class="p">):</span>
+    <span class="n">rp</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">r2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">_d</span><span class="o">/</span><span class="n">r2</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">rp1</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">r1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">_d</span><span class="o">/</span><span class="n">r1</span><span class="p">))</span>
+    <span class="n">rp2</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">r2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">_d</span><span class="o">/</span><span class="n">r2</span><span class="p">))</span>
+    <span class="n">rp</span> <span class="o">=</span> <span class="n">rp2</span> <span class="o">-</span> <span class="n">rp1</span>
+</pre></div>
+</div>
+<p>and then the correction factor is defined as</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span>
+
+<span class="k">if</span> <span class="n">rp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span>
+
+<span class="n">factor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">r2</span><span class="o">-</span><span class="n">r1</span><span class="p">)</span><span class="o">/</span><span class="n">rp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
@@ -236,6 +290,8 @@ an image corresponding to the same sample as if it was rectangular.</p>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorial.html" class="btn btn-neutral float-right" title="Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="installation.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
