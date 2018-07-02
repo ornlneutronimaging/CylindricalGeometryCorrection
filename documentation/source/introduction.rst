@@ -67,7 +67,6 @@ we can then define the correction factor as such
     else:
         factor = (2 * r) / r_p
 
-
 Inhomogeous Cylinder
 ********************
 
