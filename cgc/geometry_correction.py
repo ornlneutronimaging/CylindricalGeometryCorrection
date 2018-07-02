@@ -263,9 +263,11 @@ class GeometryCorrection():
 
     def general_correction(self, x=0):
         if np.isnan(self._inner_radius):
-            return GeometryCorrection.homogeneous_correction(x=x, radius=self._outer_radius)
+            return GeometryCorrection.homogeneous_correction(x=x,
+                                                             radius=self._outer_radius)
         else:
-            return GeometryCorrection.inhomogeneous_correction(x=x, inner_radius=self._inner_radius,
+            return GeometryCorrection.inhomogeneous_correction(x=x,
+                                                               inner_radius=self._inner_radius,
                                                                outer_radius=self._outer_radius)
 
     @staticmethod
@@ -281,13 +283,23 @@ class GeometryCorrection():
 
     @staticmethod
     def inhomogeneous_correction(x=0, inner_radius=np.NaN, outer_radius=np.NaN):
-        r = np.abs(x)
-        if r >= outer_radius:
-            return 0
-        elif (r >= inner_radius) and (r <= outer_radius):
-            return 2 * outer_radius * np.sin(np.arccos(x / outer_radius))
-        else:
-            rp1 = 2 * inner_radius * np.sin(np.arccos(x / inner_radius))
-            rp2 = 2 * outer_radius * np.sin(np.arccos(x / outer_radius))
-            rp = rp2 - rp1
-            return rp
+
+        def factor_inho(x=0, inner_radius=np.NaN, outer_radius=np.NaN):
+            r = np.abs(x)
+            if r >= outer_radius:
+                return 0
+            elif (r >= inner_radius) and (r <= outer_radius):
+                return 2 * outer_radius * np.sin(np.arccos(x / outer_radius))
+            else:
+                rp1 = 2 * inner_radius * np.sin(np.arccos(x / inner_radius))
+                rp2 = 2 * outer_radius * np.sin(np.arccos(x / outer_radius))
+                rp = rp2 - rp1
+                return rp
+
+        _value = factor_inho(x=x, inner_radius=inner_radius, outer_radius=outer_radius)
+        if x == 0:
+            return 1
+        if _value == 0:
+            _value = np.NaN
+
+        return (2*(outer_radius - inner_radius)/_value)
