@@ -4,10 +4,8 @@
     <list default="true" id="722306fa-f2dd-49f4-8cc8-56e150ae5f6f" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cgc/geometry_correction.py" beforeDir="false" afterPath="$PROJECT_DIR$/cgc/geometry_correction.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/elaborate_cylindrical_correction_algorithm.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/elaborate_cylindrical_correction_algorithm.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notebooks/tutorial_homogeneous_tiff.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/tutorial_homogeneous_tiff.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notebooks/tutorial_inhomogeneous_tiff.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/tutorial_inhomogeneous_tiff.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/cgc/empty_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/cgc/empty_test.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,7 +22,7 @@
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_for_empty_test_testHomogeneousCorrection_test_correction_intensity_4.coverage" NAME="py.test for empty_test.testHomogeneousCorrection.test_correction_intensity_4 Coverage Results" MODIFIED="1529355591587" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_for_empty_test_TestLoading_test_loading_tiff_works.coverage" NAME="py.test for empty_test.TestLoading.test_loading_tiff_works Coverage Results" MODIFIED="1527166360783" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_for_empty_test_TestInitialization_test_parameters_should_be_defined_after_loading_data.coverage" NAME="py.test for empty_test.TestInitialization.test_parameters_should_be_defined_after_loading_data Coverage Results" MODIFIED="1527169078153" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
-    <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_in_tests.coverage" NAME="py.test in tests Coverage Results" MODIFIED="1530543636497" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_in_tests.coverage" NAME="py.test in tests Coverage Results" MODIFIED="1530543679513" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_for_empty_test_testCorrection_test_calculate_pixel_intensity.coverage" NAME="py.test for empty_test.testCorrection.test_calculate_pixel_intensity Coverage Results" MODIFIED="1527268777575" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$py_test_in_empty_test_py.coverage" NAME="py.test in empty_test.py Coverage Results" MODIFIED="1527271619043" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests/cgc" />
     <SUITE FILE_PATH="coverage/CylindricalGeometryCorrection$geometry_correction.coverage" NAME="geometry_correction Coverage Results" MODIFIED="1527271698090" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/cgc" />
@@ -41,8 +39,8 @@
           <file leaf-file-name="empty_test.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="140">
-                  <caret line="220" column="44" lean-forward="true" selection-start-line="220" selection-start-column="44" selection-end-line="220" selection-end-column="44" />
+                <state relative-caret-position="485">
+                  <caret line="243" lean-forward="true" selection-start-line="243" selection-end-line="243" />
                   <folding>
                     <element signature="e#0#15#0" expanded="true" />
                   </folding>
@@ -69,8 +67,8 @@
           <file leaf-file-name="geometry_correction.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/cgc/geometry_correction.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="320">
-                  <caret line="24" column="19" lean-forward="true" selection-start-line="24" selection-start-column="19" selection-end-line="24" selection-end-column="19" />
+                <state relative-caret-position="99">
+                  <caret line="216" column="18" selection-start-line="216" selection-start-column="18" selection-end-line="216" selection-end-column="18" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
                   </folding>
@@ -122,8 +120,8 @@
         <option value="$PROJECT_DIR$/documentation/readthedocs-environment.yml" />
         <option value="$PROJECT_DIR$/codecov.yml" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/cgc/geometry_correction.py" />
         <option value="$PROJECT_DIR$/tests/cgc/empty_test.py" />
+        <option value="$PROJECT_DIR$/cgc/geometry_correction.py" />
       </list>
     </option>
   </component>
@@ -321,9 +319,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="py_test_for_empty_test_testHomogeneousCorrection - 2018.06.18 at 17h 09m 09s.xml">
-      <configuration name="py.test for empty_test.testHomogeneousCorrection" configurationId="tests" />
-    </history-entry>
     <history-entry file="py_test_for_empty_test_testHomogeneousCorrection - 2018.06.18 at 17h 11m 23s.xml">
       <configuration name="py.test for empty_test.testHomogeneousCorrection" configurationId="tests" />
     </history-entry>
@@ -351,6 +346,9 @@
     <history-entry file="py_test_in_tests - 2018.07.02 at 11h 00m 43s.xml">
       <configuration name="py.test in tests" configurationId="tests" />
     </history-entry>
+    <history-entry file="py_test_in_tests - 2018.07.02 at 11h 01m 26s.xml">
+      <configuration name="py.test in tests" configurationId="tests" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="14" y="23" width="2207" height="1362" extended-state="0" />
@@ -359,10 +357,10 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.25281805" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.25281805" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.3291592" />
       <window_info anchor="bottom" id="Python Console" order="7" weight="0.25040257" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32850242" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.32850242" />
       <window_info content_ui="combo" id="Project" order="0" weight="0.17846546" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
@@ -651,8 +649,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/cgc/empty_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="220" column="44" lean-forward="true" selection-start-line="220" selection-start-column="44" selection-end-line="220" selection-end-column="44" />
+        <state relative-caret-position="485">
+          <caret line="243" lean-forward="true" selection-start-line="243" selection-end-line="243" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
@@ -661,8 +659,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cgc/geometry_correction.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="24" column="19" lean-forward="true" selection-start-line="24" selection-start-column="19" selection-end-line="24" selection-end-column="19" />
+        <state relative-caret-position="99">
+          <caret line="216" column="18" selection-start-line="216" selection-start-column="18" selection-end-line="216" selection-end-column="18" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>

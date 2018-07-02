@@ -199,22 +199,15 @@ class GeometryCorrection():
               index: int - file index (default 0, first file)
 
         Returns:
-              image cropped using pixel center and radius information
+              image cropped using pixel center and outer radius information
         """
         _image = self.list_data[index]
         _pixel_center = self.pixel_center
         _outer_radius = self.outer_radius
-        _inner_radius = self.inner_radius
-
-        if np.isnan(_inner_radius):
-            _outer_radius = _outer_radius
-        else:
-            _outer_radius = _inner_radius
-
         return _image[: , _pixel_center - _outer_radius : _pixel_center + _outer_radius + 1]
 
     def _correct_file_index(self, index=0):
-        """main agorithm that correct geometry of file index specified
+        """main algorithm that correct geometry of file index specified
 
         Parameters:
             index: int - file index (default 0, first file)
