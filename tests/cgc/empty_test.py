@@ -38,7 +38,7 @@ class TestInitialization(unittest.TestCase):
         self.assertRaises(AttributeError, o_cgc.define_parameters, pixel_center=10)
 
     def test_parameters_should_be_correctly_defined(self):
-        '''assert pixel_center, radius1 and radius2 (if defined) have correct format'''
+        '''assert pixel_center, outer_radius and inner_radius (if defined) have correct format'''
         list_tiff = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
         o_cgc = GeometryCorrection(list_files=list_tiff)
 
@@ -50,42 +50,42 @@ class TestInitialization(unittest.TestCase):
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=600)
 
         # pixel in right range correctly saved
-        o_cgc.define_parameters(pixel_center=50, radius1=10)
+        o_cgc.define_parameters(pixel_center=50, outer_radius=10)
         self.assertEqual(50, o_cgc.pixel_center)
 
-        ## radius1
+        ## outer_radius
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50)
-        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, radius1=-3.5)
-        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, radius1=-3)
-        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=10, radius1=20)
-        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, radius1=800)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, outer_radius=-3.5)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, outer_radius=-3)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=10, outer_radius=20)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, outer_radius=800)
 
-        # correct radius1 correctly saved
-        o_cgc.define_parameters(pixel_center=250, radius1=100)
-        self.assertEqual(100, o_cgc.radius1)
+        # correct outer_radius correctly saved
+        o_cgc.define_parameters(pixel_center=250, outer_radius=100)
+        self.assertEqual(100, o_cgc.outer_radius)
 
-        ## radius2
-        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, radius1=50, radius2=0.5)
-        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, radius1=50, radius2=-20)
-        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, radius1=50, radius2=200)
+        ## inner_radius
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, outer_radius=50, inner_radius=0.5)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, outer_radius=50, inner_radius=-20)
+        self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, outer_radius=50, inner_radius=200)
 
-        # correct radius1 correctly saved
-        o_cgc.define_parameters(pixel_center=250, radius1=120, radius2=100)
-        self.assertEqual(100, o_cgc.radius2)
-        self.assertEqual(120, o_cgc.radius1)
+        # correct outer_radius correctly saved
+        o_cgc.define_parameters(pixel_center=250, outer_radius=120, inner_radius=100)
+        self.assertEqual(100, o_cgc.inner_radius)
+        self.assertEqual(120, o_cgc.outer_radius)
 
-        # correct radius1 correctly saved when no radius2
+        # correct outer_radius correctly saved when no inner_radius
         o_cgc = GeometryCorrection(list_files=list_tiff)
         o_cgc.load_files()
-        o_cgc.define_parameters(pixel_center=250, radius1=120)
-        self.assertEqual(120, o_cgc.radius1)
+        o_cgc.define_parameters(pixel_center=250, outer_radius=120)
+        self.assertEqual(120, o_cgc.outer_radius)
 
-        # make sure program sort the radius1 and 2 (radius1 being always the outside radius)
+        # make sure program sort the outer_radius and 2 (outer_radius being always the outside radius)
         o_cgc = GeometryCorrection(list_files=list_tiff)
         o_cgc.load_files()
-        o_cgc.define_parameters(pixel_center=250, radius1=100, radius2=150)
-        self.assertEqual(o_cgc.radius1, 150)
-        self.assertEqual(o_cgc.radius2, 100)
+        o_cgc.define_parameters(pixel_center=250, outer_radius=100, inner_radius=150)
+        self.assertEqual(o_cgc.outer_radius, 150)
+        self.assertEqual(o_cgc.inner_radius, 100)
 
 
 class TestLoading(unittest.TestCase):
@@ -143,11 +143,11 @@ class testHomogeneousCorrection(unittest.TestCase):
         o_cgc.load_files()
 
         # homogeneous sample
-        o_cgc.define_parameters(pixel_center=100, radius1=50)
+        o_cgc.define_parameters(pixel_center=100, outer_radius=50)
         self.assertEqual(o_cgc.get_sample_thickness_at_center(), 100)
 
         # inhomogeneous sample
-        o_cgc.define_parameters(pixel_center=100, radius1=50, radius2=70)
+        o_cgc.define_parameters(pixel_center=100, outer_radius=50, inner_radius=70)
         self.assertEqual(o_cgc.get_sample_thickness_at_center(), 40)
 
     def test_calculate_pixel_intensity(self):
@@ -155,7 +155,7 @@ class testHomogeneousCorrection(unittest.TestCase):
         list_fits = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
         o_cgc = GeometryCorrection(list_files=list_fits)
         o_cgc.load_files()
-        o_cgc.define_parameters(pixel_center=256, radius1=200)
+        o_cgc.define_parameters(pixel_center=256, outer_radius=200)
         _image_0 = o_cgc.list_data[0]
         _slice_50 = _image_0[50, :]
         self.assertAlmostEqual(2.00,
@@ -169,7 +169,7 @@ class testHomogeneousCorrection(unittest.TestCase):
         o_cgc.load_files()
         pixel_center = 256
         radius = 200
-        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius)
+        o_cgc.define_parameters(pixel_center=pixel_center, outer_radius=radius)
         _isolated_cylinder_calculated = o_cgc.isolate_cylinder_from_image(index=0)
 
         # what we expect
@@ -185,7 +185,7 @@ class testHomogeneousCorrection(unittest.TestCase):
         o_cgc_4.load_files()
         pixel_center = 256
         radius = 200
-        o_cgc_4.define_parameters(pixel_center=pixel_center, radius1=radius)
+        o_cgc_4.define_parameters(pixel_center=pixel_center, outer_radius=radius)
         o_cgc_4.correct()
         first_image_corrected4 = o_cgc_4.list_data_corrected[0]
         row_10_returned = first_image_corrected4[10, :]
@@ -201,7 +201,7 @@ class testHomogeneousCorrection(unittest.TestCase):
         o_cgc.load_files()
         pixel_center = 256
         radius = 200
-        o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius)
+        o_cgc.define_parameters(pixel_center=pixel_center, outer_radius=radius)
         o_cgc.correct()
         first_image_corrected = o_cgc.list_data_corrected[0]
         row_10_returned = first_image_corrected[10, :]
@@ -223,11 +223,11 @@ class testInhomogeneousCorrection(unittest.TestCase):
     #     o_cgc.load_files()
     #
     #     # homogeneous sample
-    #     o_cgc.define_parameters(pixel_center=100, radius1=50)
+    #     o_cgc.define_parameters(pixel_center=100, outer_radius=50)
     #     self.assertEqual(o_cgc.get_sample_thickness_at_center(), 100)
     #
     #     # inhomogeneous sample
-    #     o_cgc.define_parameters(pixel_center=100, radius1=50, radius2=70)
+    #     o_cgc.define_parameters(pixel_center=100, outer_radius=50, inner_radius=70)
     #     self.assertEqual(o_cgc.get_sample_thickness_at_center(), 40)
     #
     # def test_calculate_pixel_intensity(self):
@@ -235,7 +235,7 @@ class testInhomogeneousCorrection(unittest.TestCase):
     #     list_fits = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
     #     o_cgc = GeometryCorrection(list_files=list_fits)
     #     o_cgc.load_files()
-    #     o_cgc.define_parameters(pixel_center=256, radius1=200)
+    #     o_cgc.define_parameters(pixel_center=256, outer_radius=200)
     #     _image_0 = o_cgc.list_data[0]
     #     _slice_50 = _image_0[50, :]
     #     self.assertAlmostEqual(2.00,
@@ -249,7 +249,7 @@ class testInhomogeneousCorrection(unittest.TestCase):
     #     o_cgc.load_files()
     #     pixel_center = 256
     #     radius = 200
-    #     o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius)
+    #     o_cgc.define_parameters(pixel_center=pixel_center, outer_radius=radius)
     #     _isolated_cylinder_calculated = o_cgc.isolate_cylinder_from_image(index=0)
     #
     #     # what we expect
@@ -264,7 +264,7 @@ class testInhomogeneousCorrection(unittest.TestCase):
     #     o_cgc.load_files()
     #     pixel_center = 256
     #     radius = 200
-    #     o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius)
+    #     o_cgc.define_parameters(pixel_center=pixel_center, outer_radius=radius)
     #     o_cgc.correct()
     #     first_image_corrected = o_cgc.list_data_corrected[0]
     #     row_10_returned = first_image_corrected[10, :]
@@ -279,7 +279,7 @@ class testInhomogeneousCorrection(unittest.TestCase):
     #     o_cgc.load_files()
     #     pixel_center = 256
     #     radius = 200
-    #     o_cgc.define_parameters(pixel_center=pixel_center, radius1=radius)
+    #     o_cgc.define_parameters(pixel_center=pixel_center, outer_radius=radius)
     #     o_cgc.correct()
     #     first_image_corrected = o_cgc.list_data_corrected[0]
     #     row_10_returned = first_image_corrected[10, :]

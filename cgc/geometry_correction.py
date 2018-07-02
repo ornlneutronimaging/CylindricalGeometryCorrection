@@ -13,32 +13,32 @@ class GeometryCorrection():
     step1 = False # load
     step2 = False # parameters definition
 
-    _radius1 = np.NaN
-    _radius2 = np.NaN
+    _outer_radius = np.NaN
+    _inner_radius = np.NaN
 
     def __init__(self, list_files=[]):
         self.list_files = list_files
 
-    def run(self, notebook=False, pixel_center=np.NaN, radius1=np.NaN, radius2=np.NaN):
+    def run(self, notebook=False, pixel_center=np.NaN, outer_radius=np.NaN, inner_radius=np.NaN):
         '''run the full process without having to call the steps one by one
 
         Parameters:
             notebook: boolean - to display or not a progress bar when loading the file via notebook (default True)
             pixel_center: int - center of cylinder (default np.NaN)
-            radius1: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.NaN)
-            radius2: int - radius of outer cylinder (default is np.NaN)
+            outer_radius: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.NaN)
+            inner_radius: int - radius of outer cylinder (default is np.NaN)
 
         Raises:
             ValueError if pixel_center is not >0 int
-            ValueError if radius1 is not >0 int
-            ValueError if radius2 is not >0 int (unless np.NaN)
+            ValueError if outer_radius is not >0 int
+            ValueError if inner_radius is not >0 int (unless np.NaN)
             ValueError if pixel_center outside image size
-            ValueError if radius1 define cylinder outside image
-            ValueError if radius2 define cylinder outside image
+            ValueError if outer_radius define cylinder outside image
+            ValueError if inner_radius define cylinder outside image
 
         '''
         self.load_files(notebook=notebook)
-        self.define_parameters(pixel_center=pixel_center, radius1=radius1, radius2=radius2)
+        self.define_parameters(pixel_center=pixel_center, outer_radius=outer_radius, inner_radius=inner_radius)
 
     @property
     def list_files(self):
@@ -76,55 +76,55 @@ class GeometryCorrection():
         self._pixel_center = pixel_center
 
     @property
-    def radius1(self):
-        return self._radius1
+    def outer_radius(self):
+        return self._outer_radius
 
-    @radius1.setter
-    def radius1(self, radius1):
-        if not isinstance(radius1, int):
+    @outer_radius.setter
+    def outer_radius(self, outer_radius):
+        if not isinstance(outer_radius, int):
             raise ValueError("Radius 1 must be an integer!")
 
-        if radius1 <= 0:
+        if outer_radius <= 0:
             raise ValueError("Radius 1 must be greater than 0!")
 
         [_, width] = np.shape(self.list_data[0])
-        if (self.pixel_center - radius1) < 0:
+        if (self.pixel_center - outer_radius) < 0:
             raise ValueError("Cylinder defined by Radius 1 goes outside the image size (left side)!")
 
-        if (self.pixel_center + radius1) >= width:
+        if (self.pixel_center + outer_radius) >= width:
             raise ValueError("Cylinder defined by Radius 1 goes outside the image size (right side)!")
 
-        if np.isnan(self._radius2):
-            self._radius1 = radius1
+        if np.isnan(self._inner_radius):
+            self._outer_radius = outer_radius
         else:
-            if self._radius2 > radius1:
-                self._radius1, self._radius2 = self._radius2, radius1
+            if self._inner_radius > outer_radius:
+                self._outer_radius, self._inner_radius = self._inner_radius, outer_radius
             else:
-                self._radius1 = radius1
+                self._outer_radius = outer_radius
 
     @property
-    def radius2(self):
-        return self._radius2
+    def inner_radius(self):
+        return self._inner_radius
 
-    @radius2.setter
-    def radius2(self, radius2):
-        if not isinstance(radius2, int):
+    @inner_radius.setter
+    def inner_radius(self, inner_radius):
+        if not isinstance(inner_radius, int):
             raise ValueError("Radius 2 must be an integer!")
 
-        if radius2 <= 0:
+        if inner_radius <= 0:
             raise ValueError("Radius 2 must be greater than 0!")
 
         [_, width] = np.shape(self.list_data[0])
-        if (self.pixel_center - radius2) < 0:
+        if (self.pixel_center - inner_radius) < 0:
             raise ValueError("Cylinder defined by Radius 2 goes outside the image size (left side)!")
 
-        if (self.pixel_center + radius2) >= width:
+        if (self.pixel_center + inner_radius) >= width:
             raise ValueError("Cylinder defined by Radius 2 goes outside the image size (right side)!")
 
-        if self._radius1 > radius2:
-            self._radius2 = radius2
+        if self._outer_radius > inner_radius:
+            self._inner_radius = inner_radius
         else:
-            self._radius1, self._radius2 = radius2, self._radius1
+            self._outer_radius, self._inner_radius = inner_radius, self._outer_radius
 
     # general method
 
@@ -142,7 +142,7 @@ class GeometryCorrection():
         self.step1 = True
         del o_norm
 
-    def define_parameters(self, pixel_center=np.NaN, radius1=np.NaN, radius2=np.NaN):
+    def define_parameters(self, pixel_center=np.NaN, outer_radius=np.NaN, inner_radius=np.NaN):
         '''define the center of the cylinder and the radius 1 and optionally 2 if working with inhomogeneous sample
 
         step2
@@ -150,30 +150,30 @@ class GeometryCorrection():
         Parameters:
             pixel_center: int - center of cylinder in the horizontal direction. Algorithm consider that the
                 vertical axis is symmetrical (default np.NaN)
-            radius1: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.NaN)
-            radius2: int - radius of outer cylinder (default is np.NaN)
+            outer_radius: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.NaN)
+            inner_radius: int - radius of outer cylinder (default is np.NaN)
 
         Raises:
             ValueError if pixel_center is not >0 int
-            ValueError if radius1 is not >0 int
-            ValueError if radius2 is not >0 int (unless np.NaN)
+            ValueError if outer_radius is not >0 int
+            ValueError if inner_radius is not >0 int (unless np.NaN)
             ValueError if pixel_center outside image size
-            ValueError if radius1 define cylinder outside image
-            ValueError if radius2 define cylinder outside image
+            ValueError if outer_radius define cylinder outside image
+            ValueError if inner_radius define cylinder outside image
         '''
         self.pixel_center = pixel_center
-        self.radius1 = radius1
-        if not np.isnan(radius2):
-            self.radius2 = radius2
+        self.outer_radius = outer_radius
+        if not np.isnan(inner_radius):
+            self.inner_radius = inner_radius
 
     def get_sample_thickness_at_center(self):
         """Depending on if we are working with homogeneous or inhomogeneous samples, this algorithm calculates the
-        sample thickness. For an homogeneous sample, it's simply 2 times the radius1. For an inhomogenous sample,
+        sample thickness. For an homogeneous sample, it's simply 2 times the outer_radius. For an inhomogenous sample,
         the sample thickness is 2 times (radius_outer_cylinder - radius_inner_cylinder)"""
-        if np.isnan(self.radius2):
-            return 2 * self.radius1
+        if np.isnan(self.inner_radius):
+            return 2 * self.outer_radius
         else:
-            return 2 * (self.radius1 - self.radius2)
+            return 2 * (self.outer_radius - self.inner_radius)
 
     def calculate_pixel_intensity(self, slice=[]):
         """return the intensity of each pixel by using the radius and pixel_center info
@@ -203,13 +203,13 @@ class GeometryCorrection():
         """
         _image = self.list_data[index]
         _pixel_center = self.pixel_center
-        _radius1 = self.radius1
-        _radius2 = self.radius2
+        _outer_radius = self.outer_radius
+        _inner_radius = self.inner_radius
 
-        if np.isnan(_radius2):
-            _outer_radius = _radius1
+        if np.isnan(_inner_radius):
+            _outer_radius = _outer_radius
         else:
-            _outer_radius = _radius2
+            _outer_radius = _inner_radius
 
         return _image[: , _pixel_center - _outer_radius : _pixel_center + _outer_radius + 1]
 
@@ -231,7 +231,7 @@ class GeometryCorrection():
         for _slice_index in np.arange(height):
             _slice = _image[_slice_index, :]
             # _pixel_intensity = self.calculate_pixel_intensity(slice=_slice)
-            for _index_pixel, _pixel in enumerate(np.arange(-self.radius1, self.radius1+1)):
+            for _index_pixel, _pixel in enumerate(np.arange(-self.outer_radius, self.outer_radius+1)):
                 _intensity_of_pixel = _slice[_index_pixel]
                 _coeff = self.general_correction(x=_pixel)
                 _corrected_value = (_intensity_of_pixel * _coeff ) / 2.0
@@ -269,11 +269,11 @@ class GeometryCorrection():
             progress_ui.close()
 
     def general_correction(self, x=0):
-        if np.isnan(self._radius2):
-            return GeometryCorrection.homogeneous_correction(x=x, radius=self._radius1)
+        if np.isnan(self._inner_radius):
+            return GeometryCorrection.homogeneous_correction(x=x, radius=self._outer_radius)
         else:
-            return GeometryCorrection.inhomogeneous_correction(x=x, inner_radius=self._radius2,
-                                                               outer_radius=self._radius1)
+            return GeometryCorrection.inhomogeneous_correction(x=x, inner_radius=self._inner_radius,
+                                                               outer_radius=self._outer_radius)
 
     @staticmethod
     def homogeneous_correction(x=0, radius=np.NaN):
