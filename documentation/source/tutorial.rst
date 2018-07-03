@@ -1,7 +1,0 @@
-Tutorial
-********
-
-Homogeneous cylinders
-=====================
-
-
