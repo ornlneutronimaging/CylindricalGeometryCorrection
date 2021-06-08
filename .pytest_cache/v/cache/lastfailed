@@ -1,1 +1,8 @@
-{}
+{
+  "tests/cgc/cgc_test.py::TestInitialization": true,
+  "tests/cgc/cgc_test.py::TestLoading": true,
+  "tests/cgc/cgc_test.py::testHomogeneousCorrection": true,
+  "tests/cgc/cgc_test.py::testHomogeneousCorrection::test_calculate_pixel_intensity": true,
+  "tests/cgc/cgc_test.py::testInhomogeneousCorrection": true,
+  "tests/cgc/cgc_test.py::testInhomogeneousCorrection::test_calculate_pixel_intensity": true
+}
