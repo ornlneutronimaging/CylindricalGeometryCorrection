@@ -5,13 +5,9 @@ import numpy as np
 import matplotlib.image as mpimg
 
 
-# def make_fits(data=[], filename=''):
-#     if os.path.exists(filename):
-#         os.remove(filename)
-#     hdu = pyfits.PrimaryHDU(data)
-#     hdulist = pyfits.HDUList([hdu])
-#     hdulist.writeto(filename)
-#     hdulist.close()
+def make_fits(data=[], filename=''):
+    '''create fits file'''
+    fits.writeto(filename, data, overwrite=True)
 
 
 def make_tiff(data=[], filename=''):
