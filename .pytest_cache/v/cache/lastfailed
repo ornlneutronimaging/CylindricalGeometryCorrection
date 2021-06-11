@@ -1,8 +1,19 @@
 {
   "tests/cgc/cgc_test.py::TestInitialization": true,
+  "tests/cgc/cgc_test.py::TestInitialization::test_parameters_should_be_correctly_defined": true,
   "tests/cgc/cgc_test.py::TestLoading": true,
+  "tests/cgc/cgc_test.py::TestLoading::test_loading_fits_works": true,
+  "tests/cgc/cgc_test.py::TestLoading::test_loading_tiff_works": true,
   "tests/cgc/cgc_test.py::testHomogeneousCorrection": true,
   "tests/cgc/cgc_test.py::testHomogeneousCorrection::test_calculate_pixel_intensity": true,
+  "tests/cgc/cgc_test.py::testHomogeneousCorrection::test_calculate_sample_thickness": true,
+  "tests/cgc/cgc_test.py::testHomogeneousCorrection::test_correction_intensity_2": true,
+  "tests/cgc/cgc_test.py::testHomogeneousCorrection::test_correction_intensity_4": true,
+  "tests/cgc/cgc_test.py::testHomogeneousCorrection::test_isolate_cylinder_from_image": true,
   "tests/cgc/cgc_test.py::testInhomogeneousCorrection": true,
-  "tests/cgc/cgc_test.py::testInhomogeneousCorrection::test_calculate_pixel_intensity": true
+  "tests/cgc/cgc_test.py::testInhomogeneousCorrection::test_calculate_pixel_intensity": true,
+  "tests/cgc/cgc_test.py::testInhomogeneousCorrection::test_calculate_sample_thickness": true,
+  "tests/cgc/cgc_test.py::testInhomogeneousCorrection::test_correction_intensity_2": true,
+  "tests/cgc/cgc_test.py::testInhomogeneousCorrection::test_correction_intensity_4": true,
+  "tests/cgc/cgc_test.py::testInhomogeneousCorrection::test_isolate_cylinder_from_image": true
 }
