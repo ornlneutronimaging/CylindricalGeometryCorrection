@@ -2,6 +2,7 @@ import unittest
 import glob
 import os
 import numpy as np
+import pytest
 
 from cgc.geometry_correction import GeometryCorrection
 
@@ -15,7 +16,7 @@ class TestInitialization(unittest.TestCase):
         self.data_path = os.path.abspath(os.path.join(_file_path, "../../notebooks/data/"))
 
     def test_list_files_has_correct_format(self):
-        '''assert the list of files is a non empty and existing list of files'''
+        """assert the list of files is a non empty and existing list of files"""
 
         # string not allowed during initialization
         list_files = ''
@@ -32,14 +33,14 @@ class TestInitialization(unittest.TestCase):
         self.assertTrue(list_files == list_files_returned)
 
     def test_parameters_should_be_defined_after_loading_data(self):
-        '''assert center and radius are defined after loading the data'''
-        list_tiff = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
+        """assert center and radius are defined after loading the data"""
+        list_tiff = glob.glob(self.data_path + '/tiff/full_cylinder*.tif')
         o_cgc = GeometryCorrection(list_files=list_tiff)
         self.assertRaises(AttributeError, o_cgc.define_parameters, pixel_center=10)
 
     def test_parameters_should_be_correctly_defined(self):
-        '''assert pixel_center, outer_radius and inner_radius (if defined) have correct format'''
-        list_tiff = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
+        """assert pixel_center, outer_radius and inner_radius (if defined) have correct format"""
+        list_tiff = glob.glob(self.data_path + '/tiff/full_cylinder*.tif')
         o_cgc = GeometryCorrection(list_files=list_tiff)
 
         # pixel
@@ -95,8 +96,8 @@ class TestLoading(unittest.TestCase):
         self.data_path = os.path.abspath(os.path.join(_file_path, "../../notebooks/data/"))
 
     def test_loading_tiff_works(self):
-        '''assert loading tiff of same size works'''
-        list_tiff = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
+        """assert loading tiff of same size works"""
+        list_tiff = glob.glob(self.data_path + '/tiff/full_cylinder*.tif')
         o_cgc = GeometryCorrection(list_files=list_tiff)
         o_cgc.load_files()
 
@@ -112,8 +113,8 @@ class TestLoading(unittest.TestCase):
         self.assertTrue(width_expected, width_loaded)
 
     def test_loading_fits_works(self):
-        '''assert loading fits of same size works'''
-        list_fits = glob.glob(self.data_path + '/fits/homogeneous*.fits')
+        """assert loading fits of same size works"""
+        list_fits = glob.glob(self.data_path + '/fits/full_cylinder*.fits')
         o_cgc = GeometryCorrection(list_files=list_fits)
         o_cgc.load_files()
 
@@ -138,7 +139,7 @@ class testHomogeneousCorrection(unittest.TestCase):
     def test_calculate_sample_thickness(self):
         """assert calculation of thickness is correct for homogenous sample"""
 
-        list_fits = glob.glob(self.data_path + '/fits/homogeneous*.fits')
+        list_fits = glob.glob(self.data_path + '/fits/full_cylinder*.fits')
         o_cgc = GeometryCorrection(list_files=list_fits)
         o_cgc.load_files()
 
@@ -146,9 +147,10 @@ class testHomogeneousCorrection(unittest.TestCase):
         o_cgc.define_parameters(pixel_center=100, outer_radius=50)
         self.assertEqual(o_cgc.get_sample_thickness_at_center(), 100)
 
+    @pytest.mark.skip(reason='working on a new algorithm')
     def test_calculate_pixel_intensity(self):
         """assert calculation of pixel_intensity works"""
-        list_fits = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
+        list_fits = glob.glob(self.data_path + '/tiff/full_cylinder*.tif')
         o_cgc = GeometryCorrection(list_files=list_fits)
         o_cgc.load_files()
         o_cgc.define_parameters(pixel_center=256, outer_radius=200)
@@ -160,7 +162,7 @@ class testHomogeneousCorrection(unittest.TestCase):
 
     def test_isolate_cylinder_from_image(self):
         """assert isolation of cylinder works for homogeneous and inhomogeneous"""
-        list_tiff = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
+        list_tiff = glob.glob(self.data_path + '/tiff/full_cylinder*.tif')
         o_cgc = GeometryCorrection(list_files=list_tiff)
         o_cgc.load_files()
         pixel_center = 256
@@ -176,7 +178,7 @@ class testHomogeneousCorrection(unittest.TestCase):
 
     def test_correction_intensity_4(self):
         """assert the correction works"""
-        tiff_image = glob.glob(self.data_path + '/tiff/homogeneous_image_px_intensity_4.tif')
+        tiff_image = glob.glob(self.data_path + '/tiff/full_cylinder_px_intensity_4.tif')
         o_cgc_4 = GeometryCorrection(list_files=tiff_image)
         o_cgc_4.load_files()
         pixel_center = 256
@@ -192,7 +194,7 @@ class testHomogeneousCorrection(unittest.TestCase):
 
     def test_correction_intensity_2(self):
         """assert the correction works"""
-        tiff_image = glob.glob(self.data_path + '/tiff/homogeneous_image_px_intensity_2.tif')
+        tiff_image = glob.glob(self.data_path + '/tiff/full_cylinder_px_intensity_2.tif')
         o_cgc = GeometryCorrection(list_files=tiff_image)
         o_cgc.load_files()
         pixel_center = 256
@@ -215,7 +217,7 @@ class testInhomogeneousCorrection(unittest.TestCase):
     def test_calculate_sample_thickness(self):
         """assert calculation of thickness is correct for inhomogeneous"""
 
-        list_fits = glob.glob(self.data_path + '/fits/inhomogeneous*.fits')
+        list_fits = glob.glob(self.data_path + '/fits/hollow_cylinder*.fits')
         o_cgc = GeometryCorrection(list_files=list_fits)
         o_cgc.load_files()
 
@@ -225,7 +227,7 @@ class testInhomogeneousCorrection(unittest.TestCase):
 
     def test_calculate_pixel_intensity(self):
         """assert calculation of pixel_intensity works"""
-        list_fits = glob.glob(self.data_path + '/tiff/inhomogeneous*.tif')
+        list_fits = glob.glob(self.data_path + '/tiff/hollow_cylinder*.tif')
         o_cgc = GeometryCorrection(list_files=list_fits)
         o_cgc.load_files()
         o_cgc.define_parameters(pixel_center=256, inner_radius=150, outer_radius=200)
@@ -237,7 +239,7 @@ class testInhomogeneousCorrection(unittest.TestCase):
 
     def test_isolate_cylinder_from_image(self):
         """assert isolation of cylinder works for inhomogeneous"""
-        list_tiff = glob.glob(self.data_path + '/tiff/inhomogeneous*.tif')
+        list_tiff = glob.glob(self.data_path + '/tiff/hollow_cylinder*.tif')
         o_cgc = GeometryCorrection(list_files=list_tiff)
         o_cgc.load_files()
         pixel_center = 256
@@ -253,7 +255,7 @@ class testInhomogeneousCorrection(unittest.TestCase):
 
     def test_correction_intensity_2(self):
         """assert the correction works for inhomogenous sample of intensity 2"""
-        tiff_image = glob.glob(self.data_path + '/tiff/inhomogeneous_image_px_intensity_2.tif')
+        tiff_image = glob.glob(self.data_path + '/tiff/hollow_cylinder_image_px_intensity_2.tif')
         o_cgc = GeometryCorrection(list_files=tiff_image)
         o_cgc.load_files()
         pixel_center = 256
@@ -269,7 +271,7 @@ class testInhomogeneousCorrection(unittest.TestCase):
 
     def test_correction_intensity_4(self):
         """assert the correction works for inhomogenous sample of intensity 4"""
-        tiff_image = glob.glob(self.data_path + '/tiff/inhomogeneous_image_px_intensity_4.tif')
+        tiff_image = glob.glob(self.data_path + '/tiff/hollow_cylinder_image_px_intensity_4.tif')
         o_cgc = GeometryCorrection(list_files=tiff_image)
         o_cgc.load_files()
         pixel_center = 256
