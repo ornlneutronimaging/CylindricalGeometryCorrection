@@ -42,7 +42,7 @@ class TestInitialization(unittest.TestCase):
         list_tiff = glob.glob(self.data_path + '/tiff/homogeneous*.tif')
         o_cgc = GeometryCorrection(list_files=list_tiff)
 
-        ## pixel
+        # pixel
         # pixel center should be integer, >0 and withing the image size
         o_cgc.load_files()
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=2.5)
@@ -53,7 +53,7 @@ class TestInitialization(unittest.TestCase):
         o_cgc.define_parameters(pixel_center=50, outer_radius=10)
         self.assertEqual(50, o_cgc.pixel_center)
 
-        ## outer_radius
+        # outer_radius
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50)
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, outer_radius=-3.5)
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=50, outer_radius=-3)
@@ -64,7 +64,7 @@ class TestInitialization(unittest.TestCase):
         o_cgc.define_parameters(pixel_center=250, outer_radius=100)
         self.assertEqual(100, o_cgc.outer_radius)
 
-        ## inner_radius
+        # inner_radius
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, outer_radius=50, inner_radius=0.5)
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, outer_radius=50, inner_radius=-20)
         self.assertRaises(ValueError, o_cgc.define_parameters, pixel_center=100, outer_radius=50, inner_radius=200)

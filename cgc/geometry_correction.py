@@ -10,8 +10,8 @@ class GeometryCorrection():
     list_data = []
     list_data_corrected = []
 
-    step1 = False # load
-    step2 = False # parameters definition
+    step1 = False  # load
+    step2 = False  # parameters definition
 
     _outer_radius = np.NaN
     _inner_radius = np.NaN
@@ -19,8 +19,8 @@ class GeometryCorrection():
     def __init__(self, list_files=[]):
         self.list_files = list_files
 
-    def run(self, notebook=False, pixel_center=np.NaN, outer_radius=np.NaN, inner_radius=np.NaN):
-        '''run the full process without having to call the steps one by one
+    def run(self, notebook=False, pixel_center=np.NaN, outer_radius=np.NaN, inner_radius=np.NaN, is_thick_walls=False):
+        """run the full process without having to call the steps one by one
 
         Parameters:
             notebook: boolean - to display or not a progress bar when loading the file via notebook (default True)
@@ -36,7 +36,7 @@ class GeometryCorrection():
             ValueError if outer_radius define cylinder outside image
             ValueError if inner_radius define cylinder outside image
 
-        '''
+        """
         self.load_files(notebook=notebook)
         self.define_parameters(pixel_center=pixel_center, outer_radius=outer_radius, inner_radius=inner_radius)
 

@@ -2,7 +2,7 @@ from astropy.io import fits
 from PIL import Image
 import os
 import numpy as np
-import matplotlib.image as mpimg
+from PIL import Image
 
 
 def make_fits(data=[], filename=''):
@@ -34,5 +34,11 @@ def load_fits(filename=""):
 
 
 def load_tiff(filename=''):
-    _image = mpimg.imread(filename)
-    return _image
+    try:
+        _image = Image.open(filename)
+        # metadata = dict(_image.tag_v2)
+        data = np.asarray(_image)
+        _image.close()
+        return data
+    except OSError:
+        raise OSError("Unable to read the TIFF file provided!")
