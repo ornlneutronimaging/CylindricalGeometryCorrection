@@ -2,10 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="722306fa-f2dd-49f4-8cc8-56e150ae5f6f" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/CylindricalGeometryCorrection.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CylindricalGeometryCorrection.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.pytest_cache/v/cache/lastfailed" beforeDir="false" afterPath="$PROJECT_DIR$/.pytest_cache/v/cache/lastfailed" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notebooks/elaborate_cylindrical_correction_algorithm-NEW_FORMULA.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/elaborate_cylindrical_correction_algorithm-NEW_FORMULA.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/cgc/cgc_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/cgc/cgc_test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,6 +52,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -160,11 +163,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python tests.pytest in tests" />
-      <item itemvalue="Python tests.pytest for tests.cgc.cgc_test.testInhomogeneousCorrection.test_calculate_sample_thickness" />
       <item itemvalue="Python tests.pytest for tests.cgc.cgc_test.testInhomogeneousCorrection.test_calculate_pixel_intensity" />
-      <item itemvalue="Python tests.pytest for tests.cgc.cgc_test.testInhomogeneousCorrection.test_isolate_cylinder_from_image" />
+      <item itemvalue="Python tests.pytest for tests.cgc.cgc_test.testInhomogeneousCorrection.test_calculate_sample_thickness" />
       <item itemvalue="Python tests.pytest for tests.cgc.cgc_test.testInhomogeneousCorrection.test_correction_intensity_2" />
+      <item itemvalue="Python tests.pytest for tests.cgc.cgc_test.testInhomogeneousCorrection.test_isolate_cylinder_from_image" />
+      <item itemvalue="Python tests.pytest in tests" />
     </list>
     <recent_temporary>
       <list>
