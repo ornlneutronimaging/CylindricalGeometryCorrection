@@ -7,15 +7,22 @@ description = "Neutron imaging geometric correction for cylindrical samples"
 dynamic = ["version"]
 requires-python = ">=3.10"
 license = { text = "BSD" }
-keywords = ["neutron", "imaging", "geometry", "correction", "cylindrical", "transmission"]
+keywords = [
+  "neutron",
+  "imaging",
+  "geometry",
+  "correction",
+  "cylindrical",
+  "transmission",
+]
 readme = "README.md"
 authors = [
-  {name = "Jean Bilheux", email = "bilheuxjm@ornl.gov"},
-  {name = "Chen Zhang", email = "zhangc@ornl.gov"},
+  { name = "Jean Bilheux", email = "bilheuxjm@ornl.gov" },
+  { name = "Chen Zhang", email = "zhangc@ornl.gov" },
 ]
 maintainers = [
-  { name = "Jean Bilheux", email = "bilheuxjm@ornl.gov"},
-  { name = "Chen Zhang", email="zhangc@ornl.gov"},
+  { name = "Jean Bilheux", email = "bilheuxjm@ornl.gov" },
+  { name = "Chen Zhang", email = "zhangc@ornl.gov" },
 ]
 
 dependencies = [
@@ -106,8 +113,8 @@ conda-pypi-map = { "conda-forge" = "pixi-mapping.json" }
 [tool.pixi.dependencies]
 # Conda package dependencies
 numpy = "*"
-scipy = "*"  # Often needed for scientific computing
-matplotlib = "*"  # For visualization in notebooks
+scipy = "*"      # Often needed for scientific computing
+matplotlib = "*" # For visualization in notebooks
 
 [tool.pixi.pypi-dependencies]
 # PyPI dependencies, including this package to allow local editable installs
@@ -119,7 +126,7 @@ neutron-geomcorr = { path = ".", editable = true }
 hatchling = "*"
 versioningit = "*"
 python = ">=3.10"
-setuptools = "*"  # Required for conda package building
+setuptools = "*"   # Required for conda package building
 
 [tool.pixi.package.run-dependencies]
 python = ">=3.10"
@@ -128,7 +135,7 @@ neunorm = ">=1.6.0,<2"
 
 [tool.pixi.package]
 name = "neutron-geomcorr"
-version = "0.0.0"     # placeholder, overwritten by sync-version
+version = "0.0.0"         # placeholder, overwritten by sync-version
 
 [tool.pixi.package.build]
 backend = { name = "pixi-build-python", version = "0.1.*" }
@@ -170,7 +177,7 @@ versioningit = "*"
 sphinx = ">=8.2.1,<9"
 sphinx_rtd_theme = ">=3.0.1,<4"
 myst-parser = "*"
-nbsphinx = "*"  # For rendering notebooks in documentation
+nbsphinx = "*"                  # For rendering notebooks in documentation
 
 [tool.pixi.feature.jupyter.dependencies]
 jupyterlab = "*"

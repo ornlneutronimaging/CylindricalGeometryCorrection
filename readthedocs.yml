@@ -4,13 +4,13 @@
 # python version
 python:
    version: 3.5
-   pip_install: True
+   pip_install: true
 
 # build a PDF
 formats:
-  - none
+   - none
 
 # use a conda environment file
 # - https://conda.io/docs/using/envs.html#share-an-environment
 conda:
-  file: documentation/readthedocs-environment.yml
+   file: documentation/readthedocs-environment.yml

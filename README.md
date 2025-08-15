@@ -23,7 +23,7 @@ an image corresponding to the same rectangular sample.
 
 Such samples are called homogeneous because they are made of only one uniform and homogeneous material.
 
-But program also work with inhomogenous sample for which the cylinder is hollow such as shown here.
+But program also work with inhomogeneous sample for which the cylinder is hollow such as shown here.
 
 ![image](documentation/source/_static/inhomogeneous_cylinder_2d_view.png)
 
@@ -99,4 +99,3 @@ pixi run conda-build
 
 # Tutorial
 It's recommended to follow the notebook tutorials in the `notebooks/` directory to learn how to use the library
-
