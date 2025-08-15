@@ -1,49 +1,178 @@
-import os
+"""
+Cylindrical geometry correction for neutron transmission imaging.
+
+This module provides functionality to correct for the non-uniform path length
+through cylindrical samples in neutron transmission imaging. It handles both
+homogeneous (solid) and inhomogeneous (hollow) cylindrical samples.
+
+The correction algorithm compensates for the varying neutron path length through
+a cylinder when viewed in transmission geometry, where the edges appear brighter
+than the center due to the shorter path length.
+
+Classes
+-------
+GeometryCorrection
+    Main class for performing cylindrical geometry corrections on neutron
+    transmission images.
+
+Notes
+-----
+The cylinder must be positioned vertically (along the image height axis) for
+the correction to work properly.
+
+References
+----------
+.. [1] Kockelmann, W., et al. "Neutron imaging in materials science."
+       Physics Reports 718 (2018): 1-34.
+
+Examples
+--------
+>>> from neutron_geomcorr.geometry_correction import GeometryCorrection
+>>> # Load and correct homogeneous cylinder images
+>>> gc = GeometryCorrection(list_files=['image1.tif', 'image2.tif'])
+>>> gc.load_files()
+>>> gc.define_parameters(pixel_center=256, outer_radius=100)
+>>> gc.correct()
+>>> corrected_data = gc.list_data_corrected
+"""
+
+from __future__ import annotations
+
+from typing import List, Optional, Union
 
 import numpy as np
 from NeuNorm.normalization import Normalization
+from numpy.typing import NDArray
 
 
 class GeometryCorrection:
-    list_data = []
-    list_data_corrected = []
+    """
+    Perform cylindrical geometry correction on neutron transmission images.
 
-    step1 = False  # load
-    step2 = False  # parameters definition
+    This class handles the correction of neutron transmission images of
+    cylindrical samples, compensating for the varying path length through
+    the cylinder at different positions.
 
-    _outer_radius = np.nan
-    _inner_radius = np.nan
+    Parameters
+    ----------
+    list_files : list of str, optional
+        List of file paths to neutron transmission images to be corrected.
+        Default is empty list.
 
-    def __init__(self, list_files=[]):
+    Attributes
+    ----------
+    list_files : list of str
+        List of input file paths.
+    list_data : list of ndarray
+        List of loaded image data arrays.
+    list_data_corrected : list of ndarray
+        List of corrected image data arrays.
+    pixel_center : int
+        Horizontal pixel position of the cylinder center.
+    outer_radius : int
+        Radius of the cylinder (or outer radius for hollow cylinders).
+    inner_radius : int or float
+        Inner radius for hollow cylinders (np.nan for solid cylinders).
+
+    Examples
+    --------
+    >>> gc = GeometryCorrection(list_files=['sample.tif'])
+    >>> gc.load_files()
+    >>> gc.define_parameters(pixel_center=256, outer_radius=100)
+    >>> gc.correct()
+    """
+
+    list_data: Optional[List[NDArray[np.float64]]] = []
+    list_data_corrected: List[NDArray[np.float64]] = []
+
+    step1: bool = False  # load
+    step2: bool = False  # parameters definition
+
+    _outer_radius: float = np.nan
+    _inner_radius: float = np.nan
+    _pixel_center: int = 0
+    _list_files: List[str] = []
+
+    def __init__(self, list_files: List[str] = []) -> None:
+        """
+        Initialize the GeometryCorrection object.
+
+        Parameters
+        ----------
+        list_files : list of str, optional
+            List of file paths to neutron transmission images.
+            Default is empty list.
+        """
         self.list_files = list_files
 
-    def run(self, notebook=False, pixel_center=np.nan, outer_radius=np.nan, inner_radius=np.nan):
-        """run the full process without having to call the steps one by one
+    def run(
+        self,
+        notebook: bool = False,
+        pixel_center: Union[int, float] = np.nan,
+        outer_radius: Union[int, float] = np.nan,
+        inner_radius: Union[int, float] = np.nan,
+    ) -> None:
+        """
+        Run the full correction process.
 
-        Parameters:
-            notebook: boolean - to display or not a progress bar when loading the file via notebook (default True)
-            pixel_center: int - center of cylinder (default np.nan)
-            outer_radius: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.nan)
-            inner_radius: int - radius of outer cylinder (default is np.nan)
+        This method loads files and applies the cylindrical geometry correction
+        in one call.
 
-        Raises:
-            ValueError if pixel_center is not >0 int
-            ValueError if outer_radius is not >0 int
-            ValueError if inner_radius is not >0 int (unless np.nan)
-            ValueError if pixel_center outside image size
-            ValueError if outer_radius define cylinder outside image
-            ValueError if inner_radius define cylinder outside image
+        Parameters
+        ----------
+        notebook : bool, optional
+            Whether to display a progress bar (for Jupyter notebooks).
+            Default is False.
+        pixel_center : int
+            Horizontal pixel position of the cylinder center.
+        outer_radius : int
+            Radius of the cylinder (or outer radius for hollow cylinders).
+        inner_radius : int, optional
+            Inner radius for hollow cylinders. Default is np.nan (solid cylinder).
 
+        Raises
+        ------
+        ValueError
+            If pixel_center is not a positive integer within image bounds.
+        ValueError
+            If outer_radius is not a positive integer or defines cylinder
+            outside image bounds.
+        ValueError
+            If inner_radius is not a positive integer (when specified) or
+            defines cylinder outside image bounds.
+
+        Examples
+        --------
+        >>> gc = GeometryCorrection(list_files=['sample.tif'])
+        >>> gc.run(pixel_center=256, outer_radius=100)
         """
         self.load_files(notebook=notebook)
         self.define_parameters(pixel_center=pixel_center, outer_radius=outer_radius, inner_radius=inner_radius)
 
     @property
-    def list_files(self):
+    def list_files(self) -> List[str]:
+        """Get the list of input file paths."""
         return self._list_files
 
     @list_files.setter
-    def list_files(self, list_files):
+    def list_files(self, list_files: List[str]) -> None:
+        """
+        Set and validate the list of input files.
+
+        Parameters
+        ----------
+        list_files : list of str
+            List of file paths to validate and set.
+
+        Raises
+        ------
+        TypeError
+            If list_files is not a list.
+        ValueError
+            If any file in the list does not exist.
+        """
+        import os
+
         # list_files should be a list
         if not isinstance(list_files, list):
             raise TypeError("List of Files should be a list")
@@ -56,11 +185,27 @@ class GeometryCorrection:
         self._list_files = list_files
 
     @property
-    def pixel_center(self):
+    def pixel_center(self) -> int:
+        """Get the horizontal pixel position of cylinder center."""
         return self._pixel_center
 
     @pixel_center.setter
-    def pixel_center(self, pixel_center):
+    def pixel_center(self, pixel_center: int) -> None:
+        """
+        Set and validate the cylinder center position.
+
+        Parameters
+        ----------
+        pixel_center : int
+            Horizontal pixel position of cylinder center.
+
+        Raises
+        ------
+        AttributeError
+            If data has not been loaded yet.
+        ValueError
+            If pixel_center is not an integer or is outside image bounds.
+        """
         if self.step1 is False:
             raise AttributeError("Please define the list of files first by running the 'load_files' method!")
 
@@ -74,11 +219,26 @@ class GeometryCorrection:
         self._pixel_center = pixel_center
 
     @property
-    def outer_radius(self):
+    def outer_radius(self) -> float:
+        """Get the outer radius of the cylinder."""
         return self._outer_radius
 
     @outer_radius.setter
-    def outer_radius(self, outer_radius):
+    def outer_radius(self, outer_radius: int) -> None:
+        """
+        Set and validate the outer radius.
+
+        Parameters
+        ----------
+        outer_radius : int
+            Radius of cylinder (or outer radius for hollow cylinders).
+
+        Raises
+        ------
+        ValueError
+            If outer_radius is not a positive integer or defines cylinder
+            outside image bounds.
+        """
         if not isinstance(outer_radius, int):
             raise ValueError("Radius 1 must be an integer!")
 
@@ -101,11 +261,26 @@ class GeometryCorrection:
                 self._outer_radius = outer_radius
 
     @property
-    def inner_radius(self):
+    def inner_radius(self) -> float:
+        """Get the inner radius of hollow cylinder."""
         return self._inner_radius
 
     @inner_radius.setter
-    def inner_radius(self, inner_radius):
+    def inner_radius(self, inner_radius: int) -> None:
+        """
+        Set and validate the inner radius for hollow cylinders.
+
+        Parameters
+        ----------
+        inner_radius : int
+            Inner radius of hollow cylinder.
+
+        Raises
+        ------
+        ValueError
+            If inner_radius is not a positive integer or defines cylinder
+            outside image bounds.
+        """
         if not isinstance(inner_radius, int):
             raise ValueError("Radius 2 must be an integer!")
 
@@ -126,13 +301,20 @@ class GeometryCorrection:
 
     # general method
 
-    def load_files(self, notebook=False):
-        """loading the tiff or fits images
+    def load_files(self, notebook: bool = False) -> None:
+        """
+        Load image files into memory.
 
-        step1
+        Parameters
+        ----------
+        notebook : bool, optional
+            Whether to display a progress bar (for Jupyter notebooks).
+            Default is False.
 
-        Parameters:
-            notebook: boolean - to display or not a progress bar when loading the file via notebook (default True)
+        Notes
+        -----
+        This method uses NeuNorm for loading TIFF and FITS files.
+        After loading, sets step1 flag to True.
         """
         o_norm = Normalization()
         o_norm.load(file=self.list_files, notebook=notebook)
@@ -140,49 +322,77 @@ class GeometryCorrection:
         self.step1 = True
         del o_norm
 
-    def define_parameters(self, pixel_center=np.nan, outer_radius=np.nan, inner_radius=np.nan):
-        """define the center of the cylinder and the radius 1 and optionally 2 if working with inhomogeneous sample
+    def define_parameters(
+        self,
+        pixel_center: Union[int, float] = np.nan,
+        outer_radius: Union[int, float] = np.nan,
+        inner_radius: Union[int, float] = np.nan,
+    ) -> None:
+        """
+        Define cylinder geometry parameters.
 
-        step2
+        Parameters
+        ----------
+        pixel_center : int
+            Horizontal pixel position of cylinder center.
+        outer_radius : int
+            Radius of cylinder (or outer radius for hollow cylinders).
+        inner_radius : int, optional
+            Inner radius for hollow cylinders. Default is np.nan (solid cylinder).
 
-        Parameters:
-            pixel_center: int - center of cylinder in the horizontal direction. Algorithm consider that the
-                vertical axis is symmetrical (default np.nan)
-            outer_radius: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.nan)
-            inner_radius: int - radius of outer cylinder (default is np.nan)
+        Raises
+        ------
+        ValueError
+            If any parameter is invalid or defines cylinder outside image bounds.
 
-        Raises:
-            ValueError if pixel_center is not >0 int
-            ValueError if outer_radius is not >0 int
-            ValueError if inner_radius is not >0 int (unless np.nan)
-            ValueError if pixel_center outside image size
-            ValueError if outer_radius define cylinder outside image
-            ValueError if inner_radius define cylinder outside image
+        Notes
+        -----
+        For hollow cylinders, the method automatically ensures outer_radius > inner_radius
+        by swapping values if necessary.
         """
         self.pixel_center = pixel_center
         self.outer_radius = outer_radius
         if not np.isnan(inner_radius):
             self.inner_radius = inner_radius
 
-    def get_sample_thickness_at_center(self):
-        """Depending on if we are working with homogeneous or inhomogeneous samples, this algorithm calculates the
-        sample thickness. For an homogeneous sample, it's simply 2 times the outer_radius. For an inhomogeneous sample,
-        the sample thickness is 2 times (radius_outer_cylinder - radius_inner_cylinder)"""
+    def get_sample_thickness_at_center(self) -> float:
+        """
+        Calculate the sample thickness at the cylinder center.
+
+        Returns
+        -------
+        float
+            Sample thickness at center. For solid cylinders, returns 2 * outer_radius.
+            For hollow cylinders, returns 2 * (outer_radius - inner_radius).
+
+        Examples
+        --------
+        >>> gc.define_parameters(pixel_center=256, outer_radius=100)
+        >>> thickness = gc.get_sample_thickness_at_center()  # Returns 200
+        """
         if np.isnan(self.inner_radius):
             return 2 * self.outer_radius
         else:
             return 2 * (self.outer_radius - self.inner_radius)
 
-    def calculate_pixel_intensity(self, slice=[]):  # noqa: A002
-        """return the intensity of each pixel by using the radius and pixel_center info
+    def calculate_pixel_intensity(self, slice: NDArray[np.float64] = []) -> float:  # noqa: A002
+        """
+        Calculate the pixel intensity for normalization.
 
-        pixel_intensity is simply the value of the slice at the center position divided by the diameter
+        Parameters
+        ----------
+        slice : ndarray
+            1D array representing a horizontal slice of the image.
 
-        Parameters:
-            slice: array - slice of the image
+        Returns
+        -------
+        float
+            Normalized pixel intensity at the center position.
 
-        Returns:
-            the pixel intensity value
+        Raises
+        ------
+        ValueError
+            If slice is empty.
         """
         if len(slice) == 0:
             raise ValueError("Slice is empty!")
@@ -190,29 +400,42 @@ class GeometryCorrection:
         _effective_diameter = self.get_sample_thickness_at_center()
         return slice[self.pixel_center] / _effective_diameter
 
-    def isolate_cylinder_from_image(self, index=0):
-        """Isolate the cylinder from the rest of the image
+    def isolate_cylinder_from_image(self, index: int = 0) -> NDArray[np.float64]:
+        """
+        Extract the cylinder region from an image.
 
-        Parameters:
-              index: int - file index (default 0, first file)
+        Parameters
+        ----------
+        index : int, optional
+            Index of the image in list_data. Default is 0.
 
-        Returns:
-              image cropped using pixel center and outer radius information
+        Returns
+        -------
+        ndarray
+            2D array containing only the cylinder region.
+
+        Examples
+        --------
+        >>> cylinder_region = gc.isolate_cylinder_from_image(0)
         """
         _image = self.list_data[index]
         _pixel_center = self.pixel_center
         _outer_radius = self.outer_radius
         return _image[:, _pixel_center - _outer_radius : _pixel_center + _outer_radius + 1]
 
-    def _correct_file_index(self, index=0):
-        """main algorithm that correct geometry of file index specified
+    def _correct_file_index(self, index: int = 0) -> NDArray[np.float64]:
+        """
+        Apply correction to a single image.
 
-        Parameters:
-            index: int - file index (default 0, first file)
+        Parameters
+        ----------
+        index : int, optional
+            Index of the image to correct. Default is 0.
 
-        Returns:
-            2D of image corrected
-
+        Returns
+        -------
+        ndarray
+            Corrected 2D image array.
         """
         # _image = self.list_data[index]
         _image = self.isolate_cylinder_from_image(index=index)
@@ -234,12 +457,19 @@ class GeometryCorrection:
 
         return corrected_image / absolute_radius
 
-    def correct(self, notebook=False):
-        """main algorithm that is going to correct the cylindrical geometry
+    def correct(self, notebook: bool = False) -> None:
+        """
+        Apply cylindrical geometry correction to all loaded images.
 
-        Parameters:
-            notebook: boolean - display or not progress bar showing progress of correction (default False)
+        Parameters
+        ----------
+        notebook : bool, optional
+            Whether to display a progress bar (for Jupyter notebooks).
+            Default is False.
 
+        Notes
+        -----
+        Results are stored in the list_data_corrected attribute.
         """
         if notebook:
             from IPython.core.display import display
@@ -258,7 +488,20 @@ class GeometryCorrection:
         if notebook:
             progress_ui.close()
 
-    def general_correction(self, x=0):
+    def general_correction(self, x: float = 0) -> float:
+        """
+        Calculate the correction factor for a given position.
+
+        Parameters
+        ----------
+        x : float, optional
+            Horizontal position relative to cylinder center. Default is 0.
+
+        Returns
+        -------
+        float
+            Correction factor to apply at position x.
+        """
         if np.isnan(self._inner_radius):
             return GeometryCorrection.homogeneous_correction(x=x, radius=self._outer_radius)
         else:
@@ -267,7 +510,22 @@ class GeometryCorrection:
             )
 
     @staticmethod
-    def homogeneous_correction(x=0, radius=np.nan):
+    def homogeneous_correction(x: float = 0, radius: float = np.nan) -> float:
+        """
+        Calculate correction factor for solid cylinders.
+
+        Parameters
+        ----------
+        x : float, optional
+            Horizontal position relative to cylinder center. Default is 0.
+        radius : float
+            Cylinder radius.
+
+        Returns
+        -------
+        float
+            Correction factor for solid cylinder at position x.
+        """
         if np.abs(x) > radius:
             return 0
         rp = 2 * radius * np.sin(np.arccos(x / radius))
@@ -278,8 +536,26 @@ class GeometryCorrection:
         return (2 * radius) / rp
 
     @staticmethod
-    def inhomogeneous_correction(x=0, inner_radius=np.nan, outer_radius=np.nan):
-        def factor_inho(x=0, inner_radius=np.nan, outer_radius=np.nan):
+    def inhomogeneous_correction(x: float = 0, inner_radius: float = np.nan, outer_radius: float = np.nan) -> float:
+        """
+        Calculate correction factor for hollow cylinders.
+
+        Parameters
+        ----------
+        x : float, optional
+            Horizontal position relative to cylinder center. Default is 0.
+        inner_radius : float
+            Inner radius of hollow cylinder.
+        outer_radius : float
+            Outer radius of hollow cylinder.
+
+        Returns
+        -------
+        float
+            Correction factor for hollow cylinder at position x.
+        """
+
+        def factor_inho(x: float = 0, inner_radius: float = np.nan, outer_radius: float = np.nan) -> float:
             r = np.abs(x)
             if r >= outer_radius:
                 return 0
