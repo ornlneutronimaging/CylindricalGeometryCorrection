@@ -12,13 +12,13 @@ def make_fits(data=[], filename=''):
     hdulist = pyfits.HDUList([hdu])
     hdulist.writeto(filename)
     hdulist.close()
-    
+
 def make_tiff(data=[], filename=''):
     if os.path.exists(filename):
         os.remove(filename)
     _image = Image.fromarray(data)
     _image.save(filename)
-    
+
 def load_fits(filename=''):
     hdu_list = pyfits.open(filename)
     hdu = hdu_list[0]

@@ -1,17 +1,15 @@
 import os
-import numpy as np
 
+import numpy as np
 from NeuNorm.normalization import Normalization
 
 
-class GeometryCorrection():
-
-    list_files = []
+class GeometryCorrection:
     list_data = []
     list_data_corrected = []
 
-    step1 = False # load
-    step2 = False # parameters definition
+    step1 = False  # load
+    step2 = False  # parameters definition
 
     _outer_radius = np.nan
     _inner_radius = np.nan
@@ -20,7 +18,7 @@ class GeometryCorrection():
         self.list_files = list_files
 
     def run(self, notebook=False, pixel_center=np.nan, outer_radius=np.nan, inner_radius=np.nan):
-        '''run the full process without having to call the steps one by one
+        """run the full process without having to call the steps one by one
 
         Parameters:
             notebook: boolean - to display or not a progress bar when loading the file via notebook (default True)
@@ -36,7 +34,7 @@ class GeometryCorrection():
             ValueError if outer_radius define cylinder outside image
             ValueError if inner_radius define cylinder outside image
 
-        '''
+        """
         self.load_files(notebook=notebook)
         self.define_parameters(pixel_center=pixel_center, outer_radius=outer_radius, inner_radius=inner_radius)
 
@@ -48,12 +46,12 @@ class GeometryCorrection():
     def list_files(self, list_files):
         # list_files should be a list
         if not isinstance(list_files, list):
-            raise TypeError('List of Files should be a list')
+            raise TypeError("List of Files should be a list")
 
         # make sure the file exist
         for _file in list_files:
             if not os.path.exists(_file):
-                raise ValueError("File {} does not exist!".format(_file))
+                raise ValueError(f"File {_file} does not exist!")
 
         self._list_files = list_files
 
@@ -138,12 +136,12 @@ class GeometryCorrection():
         """
         o_norm = Normalization()
         o_norm.load(file=self.list_files, notebook=notebook)
-        self.list_data = o_norm.data['sample']['data']
+        self.list_data = o_norm.data["sample"]["data"]
         self.step1 = True
         del o_norm
 
     def define_parameters(self, pixel_center=np.nan, outer_radius=np.nan, inner_radius=np.nan):
-        '''define the center of the cylinder and the radius 1 and optionally 2 if working with inhomogeneous sample
+        """define the center of the cylinder and the radius 1 and optionally 2 if working with inhomogeneous sample
 
         step2
 
@@ -160,7 +158,7 @@ class GeometryCorrection():
             ValueError if pixel_center outside image size
             ValueError if outer_radius define cylinder outside image
             ValueError if inner_radius define cylinder outside image
-        '''
+        """
         self.pixel_center = pixel_center
         self.outer_radius = outer_radius
         if not np.isnan(inner_radius):
@@ -168,14 +166,14 @@ class GeometryCorrection():
 
     def get_sample_thickness_at_center(self):
         """Depending on if we are working with homogeneous or inhomogeneous samples, this algorithm calculates the
-        sample thickness. For an homogeneous sample, it's simply 2 times the outer_radius. For an inhomogenous sample,
+        sample thickness. For an homogeneous sample, it's simply 2 times the outer_radius. For an inhomogeneous sample,
         the sample thickness is 2 times (radius_outer_cylinder - radius_inner_cylinder)"""
         if np.isnan(self.inner_radius):
             return 2 * self.outer_radius
         else:
             return 2 * (self.outer_radius - self.inner_radius)
 
-    def calculate_pixel_intensity(self, slice=[]):
+    def calculate_pixel_intensity(self, slice=[]):  # noqa: A002
         """return the intensity of each pixel by using the radius and pixel_center info
 
         pixel_intensity is simply the value of the slice at the center position divided by the diameter
@@ -204,7 +202,7 @@ class GeometryCorrection():
         _image = self.list_data[index]
         _pixel_center = self.pixel_center
         _outer_radius = self.outer_radius
-        return _image[: , _pixel_center - _outer_radius : _pixel_center + _outer_radius + 1]
+        return _image[:, _pixel_center - _outer_radius : _pixel_center + _outer_radius + 1]
 
     def _correct_file_index(self, index=0):
         """main algorithm that correct geometry of file index specified
@@ -224,17 +222,17 @@ class GeometryCorrection():
         for _slice_index in np.arange(height):
             _slice = _image[_slice_index, :]
             # _pixel_intensity = self.calculate_pixel_intensity(slice=_slice)
-            for _index_pixel, _pixel in enumerate(np.arange(-self.outer_radius, self.outer_radius+1)):
+            for _index_pixel, _pixel in enumerate(np.arange(-self.outer_radius, self.outer_radius + 1)):
                 _intensity_of_pixel = _slice[_index_pixel]
                 _coeff = self.general_correction(x=_pixel)
-                _corrected_value = (_intensity_of_pixel * _coeff ) / 2.0
+                _corrected_value = (_intensity_of_pixel * _coeff) / 2.0
                 corrected_image[_slice_index, _index_pixel] = _corrected_value
 
         # remove first pixel
         corrected_image = corrected_image[:, 1:-1]
-        absolute_radius = self.get_sample_thickness_at_center()/2
+        absolute_radius = self.get_sample_thickness_at_center() / 2
 
-        return corrected_image/absolute_radius
+        return corrected_image / absolute_radius
 
     def correct(self, notebook=False):
         """main algorithm that is going to correct the cylindrical geometry
@@ -244,11 +242,10 @@ class GeometryCorrection():
 
         """
         if notebook:
-            from ipywidgets import widgets
             from IPython.core.display import display
+            from ipywidgets import widgets
 
-            progress_ui = widgets.IntProgress(max=len(self.list_files),
-                                              description = 'Progress:')
+            progress_ui = widgets.IntProgress(max=len(self.list_files), description="Progress:")
             display(progress_ui)
 
         self.list_data_corrected = []
@@ -263,12 +260,11 @@ class GeometryCorrection():
 
     def general_correction(self, x=0):
         if np.isnan(self._inner_radius):
-            return GeometryCorrection.homogeneous_correction(x=x,
-                                                             radius=self._outer_radius)
+            return GeometryCorrection.homogeneous_correction(x=x, radius=self._outer_radius)
         else:
-            return GeometryCorrection.inhomogeneous_correction(x=x,
-                                                               inner_radius=self._inner_radius,
-                                                               outer_radius=self._outer_radius)
+            return GeometryCorrection.inhomogeneous_correction(
+                x=x, inner_radius=self._inner_radius, outer_radius=self._outer_radius
+            )
 
     @staticmethod
     def homogeneous_correction(x=0, radius=np.nan):
@@ -283,7 +279,6 @@ class GeometryCorrection():
 
     @staticmethod
     def inhomogeneous_correction(x=0, inner_radius=np.nan, outer_radius=np.nan):
-
         def factor_inho(x=0, inner_radius=np.nan, outer_radius=np.nan):
             r = np.abs(x)
             if r >= outer_radius:
@@ -302,4 +297,4 @@ class GeometryCorrection():
         if _value == 0:
             _value = np.nan
 
-        return (2*(outer_radius - inner_radius)/_value)
+        return 2 * (outer_radius - inner_radius) / _value
