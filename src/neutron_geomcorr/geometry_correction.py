@@ -375,7 +375,7 @@ class GeometryCorrection:
         else:
             return 2 * (self.outer_radius - self.inner_radius)
 
-    def calculate_pixel_intensity(self, slice: NDArray[np.float64] = []) -> float:  # noqa: A002
+    def calculate_pixel_intensity(self, slice: Optional[NDArray[np.float64]] = None) -> float:  # noqa: A002
         """
         Calculate the pixel intensity for normalization.
 
