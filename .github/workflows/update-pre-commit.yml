@@ -1,0 +1,106 @@
+name: Update pre-commit hooks
+
+permissions:
+  contents: write
+  pull-requests: write
+
+"on":
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"  # Run at 5:00 AM UTC every Monday (same as pre-commit.ci but as backup)
+
+jobs:
+  pre-commit-update:
+    runs-on: ubuntu-latest
+    # Only run if pre-commit.ci hasn't updated in the last 7 days
+    # This acts as a backup in case pre-commit.ci is down or disabled
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check last pre-commit update
+        id: check-update
+        run: |
+          # Check if there's been a pre-commit update in the last 7 days
+          LAST_UPDATE=$(git log -1 --since="7 days ago" --grep="pre-commit" \
+            --grep="pre-commit.ci" --pretty=format:"%H" || echo "")
+          if [ -n "$LAST_UPDATE" ]; then
+            echo "Recent pre-commit update found: $LAST_UPDATE"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "No recent pre-commit update found"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Python
+        if: steps.check-update.outputs.skip != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pre-commit
+        if: steps.check-update.outputs.skip != 'true'
+        run: |
+          pip install pre-commit
+
+      - name: Update pre-commit hooks
+        if: steps.check-update.outputs.skip != 'true'
+        run: |
+          pre-commit autoupdate
+
+      - name: Check for changes
+        if: steps.check-update.outputs.skip != 'true'
+        id: check-changes
+        run: |
+          if git diff --quiet .pre-commit-config.yaml; then
+            echo "No updates available"
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Updates available"
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run pre-commit on all files
+        if: |
+          steps.check-update.outputs.skip != 'true' &&
+          steps.check-changes.outputs.has-changes == 'true'
+        run: |
+          pre-commit run --all-files || true
+
+      - name: Create pull request
+        if: |
+          steps.check-update.outputs.skip != 'true' &&
+          steps.check-changes.outputs.has-changes == 'true'
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update pre-commit hooks"
+          title: "chore: Update pre-commit hooks"
+          body: |
+            ## 🔄 Automated Pre-commit Hook Update
+
+            This PR updates the pre-commit hooks to their latest versions.
+
+            ### 📝 Note
+            This is a backup workflow. Normally,
+            [pre-commit.ci](https://pre-commit.ci) handles these updates
+            automatically.
+            This workflow only runs if no pre-commit updates have been detected
+            in the last 7 days.
+
+            ### ⚙️ Automatic Checks
+            - Unit tests will run automatically on this PR
+            - Pre-commit checks will run via pre-commit.ci
+
+            ### 📋 Review Checklist
+            - [ ] All pre-commit checks pass
+            - [ ] No breaking changes in hook updates
+            - [ ] Review the changes to `.pre-commit-config.yaml`
+          branch: update-pre-commit
+          base: next
+          labels: dependencies,pre-commit
+          delete-branch: true
+          add-paths: .pre-commit-config.yaml
