@@ -17,7 +17,3 @@ or using conda
 To use the library
 
 >>>  from neutron_geomcorr.geometry_correction import GeometryCorrection
-
-
-
-
