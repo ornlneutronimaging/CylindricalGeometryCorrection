@@ -93,7 +93,7 @@ class GeometryCorrection:
     _pixel_center: int = 0
     _list_files: List[str] = []
 
-    def __init__(self, list_files: List[str] = []) -> None:
+    def __init__(self, list_files: Optional[List[str]] = None) -> None:
         """
         Initialize the GeometryCorrection object.
 
