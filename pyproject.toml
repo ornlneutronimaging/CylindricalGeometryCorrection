@@ -113,8 +113,9 @@ conda-pypi-map = { "conda-forge" = "pixi-mapping.json" }
 [tool.pixi.dependencies]
 # Conda package dependencies
 numpy = "*"
-scipy = "*"      # Often needed for scientific computing
-matplotlib = "*" # For visualization in notebooks
+scipy = "*"           # Often needed for scientific computing
+matplotlib = "*"      # For visualization in notebooks
+plotly = ">=6.3.0,<7"
 
 [tool.pixi.pypi-dependencies]
 # PyPI dependencies, including this package to allow local editable installs
@@ -148,6 +149,7 @@ default = { features = [
   "developer",
   "package",
   "test",
+  "jupyter",
 ], solve-group = "default" }
 jupyter = { features = ["developer", "jupyter"], solve-group = "jupyter" }
 
