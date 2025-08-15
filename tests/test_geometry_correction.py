@@ -3,7 +3,7 @@ import glob
 import os
 import numpy as np
 
-from cgc.geometry_correction import GeometryCorrection
+from neutron_geomcorr.geometry_correction import GeometryCorrection
 
 ERR_OFFSET = 0.01
 

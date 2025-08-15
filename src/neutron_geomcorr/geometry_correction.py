@@ -13,25 +13,25 @@ class GeometryCorrection():
     step1 = False # load
     step2 = False # parameters definition
 
-    _outer_radius = np.NaN
-    _inner_radius = np.NaN
+    _outer_radius = np.nan
+    _inner_radius = np.nan
 
     def __init__(self, list_files=[]):
         self.list_files = list_files
 
-    def run(self, notebook=False, pixel_center=np.NaN, outer_radius=np.NaN, inner_radius=np.NaN):
+    def run(self, notebook=False, pixel_center=np.nan, outer_radius=np.nan, inner_radius=np.nan):
         '''run the full process without having to call the steps one by one
 
         Parameters:
             notebook: boolean - to display or not a progress bar when loading the file via notebook (default True)
-            pixel_center: int - center of cylinder (default np.NaN)
-            outer_radius: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.NaN)
-            inner_radius: int - radius of outer cylinder (default is np.NaN)
+            pixel_center: int - center of cylinder (default np.nan)
+            outer_radius: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.nan)
+            inner_radius: int - radius of outer cylinder (default is np.nan)
 
         Raises:
             ValueError if pixel_center is not >0 int
             ValueError if outer_radius is not >0 int
-            ValueError if inner_radius is not >0 int (unless np.NaN)
+            ValueError if inner_radius is not >0 int (unless np.nan)
             ValueError if pixel_center outside image size
             ValueError if outer_radius define cylinder outside image
             ValueError if inner_radius define cylinder outside image
@@ -142,21 +142,21 @@ class GeometryCorrection():
         self.step1 = True
         del o_norm
 
-    def define_parameters(self, pixel_center=np.NaN, outer_radius=np.NaN, inner_radius=np.NaN):
+    def define_parameters(self, pixel_center=np.nan, outer_radius=np.nan, inner_radius=np.nan):
         '''define the center of the cylinder and the radius 1 and optionally 2 if working with inhomogeneous sample
 
         step2
 
         Parameters:
             pixel_center: int - center of cylinder in the horizontal direction. Algorithm consider that the
-                vertical axis is symmetrical (default np.NaN)
-            outer_radius: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.NaN)
-            inner_radius: int - radius of outer cylinder (default is np.NaN)
+                vertical axis is symmetrical (default np.nan)
+            outer_radius: int - radius of cylinder (or outer cylinder for inhomogeneous sample) (default np.nan)
+            inner_radius: int - radius of outer cylinder (default is np.nan)
 
         Raises:
             ValueError if pixel_center is not >0 int
             ValueError if outer_radius is not >0 int
-            ValueError if inner_radius is not >0 int (unless np.NaN)
+            ValueError if inner_radius is not >0 int (unless np.nan)
             ValueError if pixel_center outside image size
             ValueError if outer_radius define cylinder outside image
             ValueError if inner_radius define cylinder outside image
@@ -271,20 +271,20 @@ class GeometryCorrection():
                                                                outer_radius=self._outer_radius)
 
     @staticmethod
-    def homogeneous_correction(x=0, radius=np.NaN):
+    def homogeneous_correction(x=0, radius=np.nan):
         if np.abs(x) > radius:
             return 0
         rp = 2 * radius * np.sin(np.arccos(x / radius))
         if x == 0:
             return 1
         if rp == 0:
-            return np.NaN
+            return np.nan
         return (2 * radius) / rp
 
     @staticmethod
-    def inhomogeneous_correction(x=0, inner_radius=np.NaN, outer_radius=np.NaN):
+    def inhomogeneous_correction(x=0, inner_radius=np.nan, outer_radius=np.nan):
 
-        def factor_inho(x=0, inner_radius=np.NaN, outer_radius=np.NaN):
+        def factor_inho(x=0, inner_radius=np.nan, outer_radius=np.nan):
             r = np.abs(x)
             if r >= outer_radius:
                 return 0
@@ -300,6 +300,6 @@ class GeometryCorrection():
         if x == 0:
             return 1
         if _value == 0:
-            _value = np.NaN
+            _value = np.nan
 
         return (2*(outer_radius - inner_radius)/_value)
