@@ -1,0 +1,67 @@
+name: Update lockfiles
+
+permissions:
+  contents: write
+  pull-requests: write
+
+"on":
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"  # Run at 5:00 AM UTC every Monday
+
+jobs:
+  pixi-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@v0.8.14
+        with:
+          run-install: false
+
+      - name: Update lockfiles
+        run: |
+          set -o pipefail
+          pixi update --json | pixi exec pixi-diff-to-markdown >> diff.md
+
+      - name: Create pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update pixi lockfile"
+          title: "chore: Update pixi lockfile"
+          body-path: diff.md
+          branch: update-pixi
+          base: next  # Default branch for this repository
+          labels: dependencies,pixi
+          delete-branch: true
+          add-paths: pixi.lock
+
+      - name: Run tests on updated dependencies
+        if: steps.cpr.outputs.pull-request-number
+        run: |
+          echo "Pull request created: #${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Tests will run automatically via the pull_request trigger in test.yaml"
+
+      - name: Add test status comment
+        if: steps.cpr.outputs.pull-request-number
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.cpr.outputs.pull-request-number }}
+          body: |
+            ## 🔄 Automated Dependency Update
+
+            This PR was automatically created to update the pixi lockfile.
+
+            ### ⚙️ Automatic Checks
+            - Unit tests will run automatically on this PR
+            - Pre-commit checks will run via pre-commit.ci
+            - Please review the test results before merging
+
+            ### 📋 Review Checklist
+            - [ ] All tests pass
+            - [ ] No breaking changes in dependencies
+            - [ ] Review the dependency changes in the diff above

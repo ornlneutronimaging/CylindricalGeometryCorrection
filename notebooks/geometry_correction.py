@@ -20,10 +20,10 @@ def inhomogeneous_correction(x=-1, inner_circle_r=1, outer_circle_r=1):
         rp2 = 2*outer_circle_r*np.sin(np.arccos(x/outer_circle_r))
         rp = rp2 - rp1
         return rp
-    
+
 def factor_inho(x=0, inner_circle_r=1, outer_circle_r=1):
-    _value = inhomogeneous_correction(x=x, 
-                                      inner_circle_r=inner_circle_r, 
+    _value = inhomogeneous_correction(x=x,
+                                      inner_circle_r=inner_circle_r,
                                       outer_circle_r=outer_circle_r)
     if x == 0:
         return 1

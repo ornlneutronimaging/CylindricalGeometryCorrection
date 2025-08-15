@@ -29,7 +29,7 @@ Such samples are called homogeneous because they are made of only one uniform an
 
 .. image:: _static/homogeneous_cylinder_2d_view.png
 
-But program also work with inhomogenous sample for which the cylinder is hollow such as shown here.
+But program also work with inhomogeneous sample for which the cylinder is hollow such as shown here.
 
 .. image:: _static/inhomogeneous_cylinder_2d_view.png
 
@@ -75,7 +75,7 @@ the cylinder being center around the x-axis and beam is coming from the bottom.
 
 .. image:: _static/inhomogeneous_cylinder.png
 
-Just like the homogenous case, we need to calculate the effective sample thickness (2*rp) exposed to the beam.
+Just like the homogeneous case, we need to calculate the effective sample thickness (2*rp) exposed to the beam.
 
 .. code-block:: python
 
