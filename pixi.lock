@@ -4852,8 +4852,8 @@ packages:
   requires_python: '>=3.10'
 - pypi: ./
   name: neutron-geomcorr
-  version: 1.1.0.dev3
-  sha256: 4c781996c7aab2bd0df7d247a84e7c84db28ce565223d5414623bd47dbcb98a3
+  version: 1.1.0.dev4
+  sha256: 0d86ffc69ada3cb37ffa3bb81da808accdb658fcab044fa13602efc8b8391fa2
   requires_dist:
   - h5py
   - neunorm>=1.6.0,<2
