@@ -6,17 +6,17 @@ using pip
 
 .. code-block:: html
 
-    $ pip install CylindricalGeometryCorrection
+    $ pip install neutron-geomcorr
 
 or using conda
 
 .. code-block:: html
 
-    $ conda install -c neutronimaging CylindricalGeometryCorrection
+    $ conda install -c neutronimaging neutron-geomcorr
 
 To use the library
 
->>>  from cgc.geometry_correction import GeometryCorrection
+>>>  from neutron_geomcorr.geometry_correction import GeometryCorrection
 
 
 
