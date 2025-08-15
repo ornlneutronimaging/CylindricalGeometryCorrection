@@ -34,5 +34,3 @@ updates:
       include: "scope"
     # Only create PRs for security updates since we use pixi for normal updates
     open-pull-requests-limit: 0
-    # But still create security updates
-    security-updates-only: true
