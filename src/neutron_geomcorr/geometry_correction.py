@@ -184,7 +184,7 @@ class GeometryCorrection:
         Returns:
             the pixel intensity value
         """
-        if slice == []:
+        if len(slice) == 0:
             raise ValueError("Slice is empty!")
 
         _effective_diameter = self.get_sample_thickness_at_center()
