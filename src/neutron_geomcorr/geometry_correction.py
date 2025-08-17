@@ -472,7 +472,7 @@ class GeometryCorrection:
         Results are stored in the list_data_corrected attribute.
         """
         if notebook:
-            from IPython.core.display import display
+            from IPython.display import display
             from ipywidgets import widgets
 
             progress_ui = widgets.IntProgress(max=len(self.list_files), description="Progress:")
