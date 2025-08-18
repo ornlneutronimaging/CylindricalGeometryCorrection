@@ -65,18 +65,68 @@ release = "0.1.0"
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ["_build", "**.ipynb_checkpoints"]
+exclude_patterns = ["_build", "**.ipynb_checkpoints", "archived_notebooks_backup"]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
+
+# -- nbsphinx configuration -----------------------------------------------
+
+# Execute notebooks before conversion: 'never', 'always', 'auto' (default)
+# Set to 'never' to avoid execution errors during docs build
+nbsphinx_execute = "never"
+
+# Allow errors in notebooks (for pre-executed notebooks with outputs)
+nbsphinx_allow_errors = True
+
+# Suppress certain warnings from notebook outputs
+suppress_warnings = [
+    "nbsphinx",
+    "nbsphinx.localfile",
+    "nbsphinx.gallery",
+    "nbsphinx.directives",
+    "nbsphinx.ipynb_code_lexer",
+]
+
+# Use Python 3 lexer for code cells
+nbsphinx_codecell_lexer = "python3"
+
+# Timeout for notebook execution (in seconds)
+nbsphinx_timeout = 300
+
+# Kernel name for executing notebooks
+nbsphinx_kernel_name = "python3"
+
+# Don't add prompts to code cells
+nbsphinx_prompt_width = "0"
+
+# Disable RST syntax validation in notebooks
+nbsphinx_assume_equations = False
+
+# Disable input/output prompts
+nbsphinx_input_prompt = ""
+nbsphinx_output_prompt = ""
+
+# Custom CSS to hide certain elements
+nbsphinx_prolog = """
+.. raw:: html
+
+    <style>
+        /* Hide prompts and unnecessary elements */
+        .nbinput .prompt,
+        .nboutput .prompt {
+            display: none;
+        }
+    </style>
+"""
 
 
 # -- Options for HTML output ----------------------------------------------

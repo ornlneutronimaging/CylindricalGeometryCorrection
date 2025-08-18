@@ -4720,13 +4720,14 @@ packages:
   requires_python: '>=3.10'
 - pypi: ./
   name: neutron-geomcorr
-  version: 1.1.0.dev3
-  sha256: 97cc391d70d8043a39deb4065463848a8bb9d8374a218c1ce2d8b6b8de984ce8
+  version: 1.1.0.dev6
+  sha256: 4a3d2b4be2db7087d3471fe3f6f3429fb984778d555d33d38b1252a7ffdb7af3
   requires_dist:
   - h5py
   - neunorm>=1.6.0,<2
   - numpy>=1.20,<3
   - myst-parser ; extra == 'docs'
+  - nbsphinx>=0.8.0,<1.0 ; extra == 'docs'
   - sphinx-rtd-theme>=3.0.1,<4 ; extra == 'docs'
   - sphinx>=8.2.1,<9 ; extra == 'docs'
   - versioningit ; extra == 'docs'
