@@ -78,6 +78,24 @@ pygments_style = "sphinx"
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+# -- nbsphinx configuration -----------------------------------------------
+
+# Execute notebooks before conversion: 'never', 'always', 'auto' (default)
+# Set to 'never' to avoid execution errors during docs build
+nbsphinx_execute = "never"
+
+# Allow errors in notebooks (for pre-executed notebooks with outputs)
+nbsphinx_allow_errors = True
+
+# Suppress certain warnings from notebook outputs
+suppress_warnings = ["nbsphinx"]
+
+# Use Python 3 lexer for code cells
+nbsphinx_codecell_lexer = "python3"
+
+# Timeout for notebook execution (in seconds)
+nbsphinx_timeout = 300
+
 
 # -- Options for HTML output ----------------------------------------------
 
