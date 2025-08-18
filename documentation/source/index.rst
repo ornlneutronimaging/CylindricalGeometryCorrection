@@ -12,8 +12,7 @@ Welcome to CylindricalGeometryCorrection's documentation!
 
    installation
    introduction
-   tutorial_homogeneous_tiff
-   tutorial_inhomogeneous_tiff
+   tutorials
 
 
 Indices and tables
