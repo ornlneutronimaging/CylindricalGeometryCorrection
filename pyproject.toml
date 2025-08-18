@@ -113,9 +113,11 @@ conda-pypi-map = { "conda-forge" = "pixi-mapping.json" }
 [tool.pixi.dependencies]
 # Conda package dependencies
 numpy = "*"
-scipy = "*"           # Often needed for scientific computing
-matplotlib = "*"      # For visualization in notebooks
+scipy = "*"                    # Often needed for scientific computing
+matplotlib = "*"               # For visualization in notebooks
 plotly = ">=6.3.0,<7"
+tifffile = ">=2025.6.11,<2026"
+pandas = ">=2.3.1,<3"
 
 [tool.pixi.pypi-dependencies]
 # PyPI dependencies, including this package to allow local editable installs
