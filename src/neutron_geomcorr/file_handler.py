@@ -97,7 +97,7 @@ def make_fits(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
         raise ImportError("astropy is required for FITS file operations. Install it with: pip install astropy")
 
     if data.ndim != 2:
-        raise ValueError(f"Data must be 2D array, got {data.ndim}D")
+    validate_image_data(data)
 
     filename = Path(filename)
 
