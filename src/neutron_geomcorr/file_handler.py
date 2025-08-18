@@ -154,7 +154,7 @@ def make_tiff(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
         raise ImportError("Pillow is required for TIFF file operations. Install it with: pip install Pillow")
 
     if data.ndim != 2:
-        raise ValueError(f"Data must be 2D array, got {data.ndim}D")
+    validate_image_data(data)
 
     filename = Path(filename)
 
