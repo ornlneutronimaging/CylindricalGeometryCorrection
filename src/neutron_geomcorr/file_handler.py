@@ -96,7 +96,6 @@ def make_fits(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
     if not HAS_ASTROPY:
         raise ImportError("astropy is required for FITS file operations. Install it with: pip install astropy")
 
-    if data.ndim != 2:
     validate_image_data(data)
 
     filename = Path(filename)
@@ -153,7 +152,6 @@ def make_tiff(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
     if not HAS_PIL:
         raise ImportError("Pillow is required for TIFF file operations. Install it with: pip install Pillow")
 
-    if data.ndim != 2:
     validate_image_data(data)
 
     filename = Path(filename)
