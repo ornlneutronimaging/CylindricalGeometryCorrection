@@ -437,7 +437,6 @@ class GeometryCorrection:
         ndarray
             Corrected 2D image array.
         """
-        # _image = self.list_data[index]
         _image = self.isolate_cylinder_from_image(index=index)
 
         [height, width] = np.shape(_image)
