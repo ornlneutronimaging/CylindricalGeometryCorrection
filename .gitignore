@@ -15,7 +15,7 @@
 pyproject.toml.bak
 _version.py
 .ruff_cache/
-.pytest_cache/
+.pytest_cache
 htmlcov/
 
 ### Linux ###
