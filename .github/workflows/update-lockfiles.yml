@@ -48,7 +48,7 @@ jobs:
 
       - name: Add test status comment
         if: steps.cpr.outputs.pull-request-number
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ steps.cpr.outputs.pull-request-number }}
           body: |
