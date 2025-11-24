@@ -16,7 +16,7 @@ jobs:
     # This acts as a backup in case pre-commit.ci is down or disabled
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
