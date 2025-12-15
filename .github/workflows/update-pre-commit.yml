@@ -74,7 +74,7 @@ jobs:
           steps.check-update.outputs.skip != 'true' &&
           steps.check-changes.outputs.has-changes == 'true'
         id: cpr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: update pre-commit hooks"
