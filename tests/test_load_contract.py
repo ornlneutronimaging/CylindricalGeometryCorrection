@@ -92,7 +92,12 @@ class TestLoadDtypeContract:
 
 
 class TestLoadHiddenSemantics:
-    """Pin validation and filtering behaviors inherited from NeuNorm 1.x."""
+    """Pin the loader's validation and pass-through semantics.
+
+    Some behaviors are carried over from NeuNorm 1.x (shape-mismatch
+    rejection, squeezing), others deliberately replace 1.x behavior
+    (verbatim pass-through with no gamma filter, multi-frame rejection).
+    """
 
     def test_saturated_uint16_pixel_loads_unchanged(self, tmp_path):
         """assert pixel values are passed through verbatim, even at saturation
@@ -111,7 +116,7 @@ class TestLoadHiddenSemantics:
         np.testing.assert_array_equal(np.asarray(o_cgc.list_data[0]), image.astype(np.float32))
 
     def test_unsaturated_integer_image_loads_unchanged(self, tmp_path):
-        """assert the gamma filter is a no-op away from saturation"""
+        """assert integer TIFF data loads verbatim (as float32)"""
         rng = np.random.default_rng(42)
         image = rng.integers(0, 1000, size=(32, 32), dtype=np.uint16)
         path = tmp_path / "unsaturated.tif"
@@ -154,6 +159,23 @@ class TestLoadHiddenSemantics:
         loaded = np.asarray(o_cgc.list_data[0])
         assert loaded.shape == (16, 16)
         np.testing.assert_array_equal(loaded, data[0].astype(np.float32))
+
+    def test_multi_frame_stack_is_rejected(self, tmp_path):
+        """assert files that stay 3D after squeezing fail fast
+
+        Downstream code assumes 2D images; 1.x rejected multi-frame FITS
+        inside NeuNorm, and the direct loader must not silently regress to
+        passing 3D arrays through.
+        """
+        from astropy.io import fits as astropy_fits
+
+        data = np.arange(2 * 16 * 16, dtype=np.float64).reshape(2, 16, 16)
+        path = tmp_path / "stack2.fits"
+        astropy_fits.HDUList([astropy_fits.PrimaryHDU(data)]).writeto(str(path))
+
+        o_cgc = GeometryCorrection(list_files=[str(path)])
+        with pytest.raises(OSError, match="2D"):
+            o_cgc.load_files()
 
 
 class TestOrientationCanary:

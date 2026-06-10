@@ -313,16 +313,20 @@ class GeometryCorrection:
         Raises
         ------
         OSError
-            If a file has an unsupported extension (TIFF/FITS only) or its
-            shape does not match the previously loaded images.
+            If a file has an unsupported extension (TIFF/FITS only), does
+            not contain a single 2D image after squeezing, or its shape
+            does not match the previously loaded images.
 
         Notes
         -----
-        TIFF files are read with tifffile and FITS files with astropy.
-        All images are returned as float32 and squeezed to 2D, and every
-        image must have the same shape. After loading, sets step1 flag
-        to True.
+        TIFF files (``.tif``/``.tiff``) are read with tifffile; FITS files
+        (``.fits``/``.fit``/``.fts``) are read with astropy. All images are
+        returned as float32; singleton dimensions are squeezed away and the
+        result must be a single 2D image (multi-frame stacks are rejected).
+        Every image must have the same shape. After loading, sets step1
+        flag to True.
         """
+        progress_ui = None
         if notebook:
             from IPython.display import display
             from ipywidgets import widgets
@@ -331,30 +335,36 @@ class GeometryCorrection:
             display(progress_ui)
 
         list_data = []
-        for _index, _file in enumerate(self.list_files):
-            _lower = str(_file).lower()
-            if _lower.endswith((".tif", ".tiff")):
-                import tifffile
+        try:
+            for _index, _file in enumerate(self.list_files):
+                _lower = str(_file).lower()
+                if _lower.endswith((".tif", ".tiff")):
+                    import tifffile
 
-                _data = tifffile.imread(_file)
-            elif _lower.endswith((".fits", ".fit", ".fts")):
-                from astropy.io import fits
+                    _data = tifffile.imread(_file)
+                elif _lower.endswith((".fits", ".fit", ".fts")):
+                    from astropy.io import fits
 
-                with fits.open(_file, ignore_missing_end=True) as hdulist:
-                    _data = hdulist[0].data
-            else:
-                raise OSError(f"File format of {_file} is not supported (TIFF/FITS only)")
+                    with fits.open(_file, ignore_missing_end=True) as hdulist:
+                        _data = hdulist[0].data
+                else:
+                    raise OSError(f"File format of {_file} is not supported (TIFF/FITS only)")
 
-            _image = np.squeeze(np.asarray(_data, dtype=np.float32))
-            if list_data and _image.shape != list_data[0].shape:
-                raise OSError("Shape of sample does not match previously loaded data set!")
-            list_data.append(_image)
+                _image = np.squeeze(np.asarray(_data, dtype=np.float32))
+                if _image.ndim != 2:
+                    raise OSError(
+                        f"{_file} does not contain a single 2D image "
+                        f"(shape {np.shape(_data)} after squeezing is {_image.ndim}D)"
+                    )
+                if list_data and _image.shape != list_data[0].shape:
+                    raise OSError("Shape of sample does not match previously loaded data set!")
+                list_data.append(_image)
 
-            if notebook:
-                progress_ui.value = _index + 1
-
-        if notebook:
-            progress_ui.close()
+                if progress_ui is not None:
+                    progress_ui.value = _index + 1
+        finally:
+            if progress_ui is not None:
+                progress_ui.close()
 
         self.list_data = list_data
         self.step1 = True
