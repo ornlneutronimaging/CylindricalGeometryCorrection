@@ -300,3 +300,83 @@ class TestErrorHandling(TestFileHandler):
 
         with pytest.raises(ImportError, match="matplotlib or Pillow"):
             file_handler.load_tiff(dummy_file)
+
+
+class TestLoadTiffPilBranch(TestFileHandler):
+    """Pin the relationship between load_tiff's two code paths."""
+
+    def test_pil_fallback_matches_matplotlib_for_uint16(self, temp_dir, monkeypatch):
+        """assert both load_tiff code paths agree on integer TIFFs"""
+        if not (file_handler.HAS_MATPLOTLIB and file_handler.HAS_PIL):
+            pytest.skip("both matplotlib and Pillow required for this comparison")
+        from PIL import Image
+
+        data = np.arange(64 * 64, dtype=np.uint16).reshape(64, 64)
+        filename = temp_dir / "u16.tif"
+        Image.fromarray(data).save(str(filename))
+
+        via_matplotlib = file_handler.load_tiff(filename)
+        monkeypatch.setattr(file_handler, "HAS_MATPLOTLIB", False)
+        via_pil = file_handler.load_tiff(filename)
+
+        assert via_pil.dtype == np.float64
+        np.testing.assert_allclose(via_pil, via_matplotlib, rtol=1e-6)
+
+    def test_matplotlib_path_mangles_float_tiff(self, tiff_data_dir, monkeypatch):
+        """Characterization of a real bug: the default (matplotlib) path
+        returns an RGBA uint8 render -- not the data -- for the float
+        (mode 'F') TIFFs this project itself produces and ships as fixtures.
+        The PIL fallback returns the true 2D float data. Tracked for the
+        file_handler fix PR; this test pins today's broken behavior so the
+        fix is explicit.
+        """
+        if not (file_handler.HAS_MATPLOTLIB and file_handler.HAS_PIL):
+            pytest.skip("both matplotlib and Pillow required for this comparison")
+
+        filename = tiff_data_dir / "homogeneous_image_px_intensity_4.tif"
+        via_matplotlib = file_handler.load_tiff(filename)
+        monkeypatch.setattr(file_handler, "HAS_MATPLOTLIB", False)
+        via_pil = file_handler.load_tiff(filename)
+
+        # the PIL path returns the documented contract (2D data)...
+        assert via_pil.ndim == 2
+        # ...while the default path currently violates it (RGBA, 0-255)
+        assert via_matplotlib.ndim == 3
+        assert via_matplotlib.shape[-1] == 4
+
+
+class TestMakeTiffFloatNormalization(TestFileHandler):
+    """Characterization: make_tiff min-max rescales float data to uint16.
+
+    The original scale and offset are discarded (every image gets its own
+    stretch), which silently destroys the quantitative scale of corrected
+    transmission data. Pinned here so the planned fix (native float TIFF)
+    changes this consciously.
+    """
+
+    def test_float_data_is_minmax_rescaled_to_uint16(self, temp_dir):
+        if not file_handler.HAS_PIL:
+            pytest.skip("Pillow not installed")
+
+        data = np.linspace(0.5, 2.5, 64 * 64, dtype=np.float64).reshape(64, 64)
+        filename = temp_dir / "float_rescaled.tif"
+        file_handler.make_tiff(data, filename)
+        loaded = file_handler.load_tiff(filename)
+
+        # quantitative values are gone: full min-max stretch to [0, 65535]
+        assert loaded.min() == 0.0
+        assert loaded.max() == 65535.0
+        expected = ((data - data.min()) / (data.max() - data.min()) * 65535).astype(np.uint16)
+        np.testing.assert_allclose(loaded, expected.astype(np.float64), atol=1.0)
+
+    def test_constant_float_image_becomes_all_zeros(self, temp_dir):
+        """assert the degenerate constant-image branch zeroes everything"""
+        if not file_handler.HAS_PIL:
+            pytest.skip("Pillow not installed")
+
+        data = np.full((32, 32), 7.5, dtype=np.float64)
+        filename = temp_dir / "constant.tif"
+        file_handler.make_tiff(data, filename)
+        loaded = file_handler.load_tiff(filename)
+
+        np.testing.assert_array_equal(loaded, np.zeros((32, 32), dtype=np.float64))
