@@ -42,6 +42,7 @@ from typing import List, Optional, Union
 
 import numpy as np
 from numpy.typing import NDArray
+from tqdm.auto import tqdm
 
 
 class GeometryCorrection:
@@ -325,46 +326,34 @@ class GeometryCorrection:
         result must be a single 2D image (multi-frame stacks are rejected).
         Every image must have the same shape. After loading, sets step1
         flag to True.
+
+        The progress bar is a ``tqdm.auto`` bar: a widget inside Jupyter,
+        a console bar elsewhere.
         """
-        progress_ui = None
-        if notebook:
-            from IPython.display import display
-            from ipywidgets import widgets
-
-            progress_ui = widgets.IntProgress(max=len(self.list_files), description="Progress:")
-            display(progress_ui)
-
         list_data = []
-        try:
-            for _index, _file in enumerate(self.list_files):
-                _lower = str(_file).lower()
-                if _lower.endswith((".tif", ".tiff")):
-                    import tifffile
+        for _file in tqdm(self.list_files, desc="Loading", disable=not notebook, leave=False):
+            _lower = str(_file).lower()
+            if _lower.endswith((".tif", ".tiff")):
+                import tifffile
 
-                    _data = tifffile.imread(_file)
-                elif _lower.endswith((".fits", ".fit", ".fts")):
-                    from astropy.io import fits
+                _data = tifffile.imread(_file)
+            elif _lower.endswith((".fits", ".fit", ".fts")):
+                from astropy.io import fits
 
-                    with fits.open(_file, ignore_missing_end=True) as hdulist:
-                        _data = hdulist[0].data
-                else:
-                    raise OSError(f"File format of {_file} is not supported (TIFF/FITS only)")
+                with fits.open(_file, ignore_missing_end=True) as hdulist:
+                    _data = hdulist[0].data
+            else:
+                raise OSError(f"File format of {_file} is not supported (TIFF/FITS only)")
 
-                _image = np.squeeze(np.asarray(_data, dtype=np.float32))
-                if _image.ndim != 2:
-                    raise OSError(
-                        f"{_file} does not contain a single 2D image "
-                        f"(shape {np.shape(_data)} after squeezing is {_image.ndim}D)"
-                    )
-                if list_data and _image.shape != list_data[0].shape:
-                    raise OSError("Shape of sample does not match previously loaded data set!")
-                list_data.append(_image)
-
-                if progress_ui is not None:
-                    progress_ui.value = _index + 1
-        finally:
-            if progress_ui is not None:
-                progress_ui.close()
+            _image = np.squeeze(np.asarray(_data, dtype=np.float32))
+            if _image.ndim != 2:
+                raise OSError(
+                    f"{_file} does not contain a single 2D image "
+                    f"(shape {np.shape(_data)} after squeezing is {_image.ndim}D)"
+                )
+            if list_data and _image.shape != list_data[0].shape:
+                raise OSError("Shape of sample does not match previously loaded data set!")
+            list_data.append(_image)
 
         self.list_data = list_data
         self.step1 = True
@@ -516,23 +505,13 @@ class GeometryCorrection:
         Notes
         -----
         Results are stored in the list_data_corrected attribute.
+
+        The progress bar is a ``tqdm.auto`` bar: a widget inside Jupyter,
+        a console bar elsewhere.
         """
-        if notebook:
-            from IPython.display import display
-            from ipywidgets import widgets
-
-            progress_ui = widgets.IntProgress(max=len(self.list_files), description="Progress:")
-            display(progress_ui)
-
         self.list_data_corrected = []
-        for _index, _file in enumerate(self.list_data):
+        for _index in tqdm(range(len(self.list_data)), desc="Correcting", disable=not notebook, leave=False):
             self.list_data_corrected.append(self._correct_file_index(_index))
-
-            if notebook:
-                progress_ui.value = _index + 1
-
-        if notebook:
-            progress_ui.close()
 
     def general_correction(self, x: float = 0) -> float:
         """
