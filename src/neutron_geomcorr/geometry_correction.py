@@ -41,7 +41,6 @@ from __future__ import annotations
 from typing import List, Optional, Union
 
 import numpy as np
-from NeuNorm.normalization import Normalization
 from numpy.typing import NDArray
 
 
@@ -311,16 +310,54 @@ class GeometryCorrection:
             Whether to display a progress bar (for Jupyter notebooks).
             Default is False.
 
+        Raises
+        ------
+        OSError
+            If a file has an unsupported extension (TIFF/FITS only) or its
+            shape does not match the previously loaded images.
+
         Notes
         -----
-        This method uses NeuNorm for loading TIFF and FITS files.
-        After loading, sets step1 flag to True.
+        TIFF files are read with tifffile and FITS files with astropy.
+        All images are returned as float32 and squeezed to 2D, and every
+        image must have the same shape. After loading, sets step1 flag
+        to True.
         """
-        o_norm = Normalization()
-        o_norm.load(file=self.list_files, notebook=notebook)
-        self.list_data = o_norm.data["sample"]["data"]
+        if notebook:
+            from IPython.display import display
+            from ipywidgets import widgets
+
+            progress_ui = widgets.IntProgress(max=len(self.list_files), description="Progress:")
+            display(progress_ui)
+
+        list_data = []
+        for _index, _file in enumerate(self.list_files):
+            _lower = str(_file).lower()
+            if _lower.endswith((".tif", ".tiff")):
+                import tifffile
+
+                _data = tifffile.imread(_file)
+            elif _lower.endswith((".fits", ".fit", ".fts")):
+                from astropy.io import fits
+
+                with fits.open(_file, ignore_missing_end=True) as hdulist:
+                    _data = hdulist[0].data
+            else:
+                raise OSError(f"File format of {_file} is not supported (TIFF/FITS only)")
+
+            _image = np.squeeze(np.asarray(_data, dtype=np.float32))
+            if list_data and _image.shape != list_data[0].shape:
+                raise OSError("Shape of sample does not match previously loaded data set!")
+            list_data.append(_image)
+
+            if notebook:
+                progress_ui.value = _index + 1
+
+        if notebook:
+            progress_ui.close()
+
+        self.list_data = list_data
         self.step1 = True
-        del o_norm
 
     def define_parameters(
         self,
