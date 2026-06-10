@@ -1,11 +1,14 @@
-"""Characterization tests pinning the load contract before the NeuNorm removal.
+"""Contract tests for GeometryCorrection.load_files().
 
-These tests document the exact observable behavior of
-``GeometryCorrection.load_files()`` under NeuNorm 1.x so that the planned
-loader replacement (NeuNorm -> direct tifffile/astropy I/O) can demonstrate
-behavior parity. Tests that pin known 1.x quirks (per-format dtypes, the
-auto gamma filter on saturated integer data) are expected to be revisited
-*consciously* by the loader-replacement PR rather than silently inherited.
+Originally written against NeuNorm 1.x to pin the load contract; updated by
+the loader-replacement PR (NeuNorm -> direct tifffile/astropy I/O) to encode
+the new, normalized contract. Deliberate behavior changes from 1.x:
+
+- dtype is uniformly float32 for both formats (1.x: float32 TIFF but raw
+  big-endian float64 FITS)
+- the auto gamma filter is gone: saturated integer pixels load unchanged
+  (1.x silently neighbor-averaged them)
+- ``.fit``/``.fts`` extensions are accepted in addition to ``.fits``
 """
 
 import numpy as np
@@ -69,13 +72,12 @@ class TestLoadContract:
         )
 
 
-class TestLoadDtypeCharacterization:
-    """Pin the (inconsistent) per-format dtypes NeuNorm 1.x produces.
+class TestLoadDtypeContract:
+    """Both formats load as native float32.
 
-    TIFF goes through the auto gamma filter and comes back float32; FITS hits
-    an exception path inside the gamma filter and is returned unchanged as
-    big-endian float64. The loader-replacement PR may deliberately normalize
-    this -- these tests exist so that change is explicit, not accidental.
+    Deliberate normalization vs NeuNorm 1.x, which returned float32 for TIFF
+    but raw big-endian float64 for FITS. Note for full-precision float64 FITS
+    inputs this is a (documented) precision reduction.
     """
 
     def test_tiff_loads_as_float32(self, tiff_data_dir):
@@ -83,20 +85,27 @@ class TestLoadDtypeCharacterization:
         o_cgc.load_files()
         assert o_cgc.list_data[0].dtype == np.float32
 
-    def test_fits_loads_as_big_endian_float64(self, fits_data_dir):
+    def test_fits_loads_as_float32(self, fits_data_dir):
         o_cgc = GeometryCorrection(list_files=[str(fits_data_dir / "homogeneous_image_px_intensity_4.fits")])
         o_cgc.load_files()
-        dtype = o_cgc.list_data[0].dtype
-        assert dtype.kind == "f"
-        assert dtype.itemsize == 8
-        assert dtype.byteorder == ">"
+        assert o_cgc.list_data[0].dtype == np.float32
 
 
 class TestLoadHiddenSemantics:
-    """Pin validation and filtering behaviors inherited from NeuNorm 1.x."""
+    """Pin the loader's validation and pass-through semantics.
 
-    def test_saturated_uint16_pixel_is_replaced(self, tmp_path):
-        """assert the 1.x auto gamma filter replaces saturated integer pixels"""
+    Some behaviors are carried over from NeuNorm 1.x (shape-mismatch
+    rejection, squeezing), others deliberately replace 1.x behavior
+    (verbatim pass-through with no gamma filter, multi-frame rejection).
+    """
+
+    def test_saturated_uint16_pixel_loads_unchanged(self, tmp_path):
+        """assert pixel values are passed through verbatim, even at saturation
+
+        Deliberate change vs NeuNorm 1.x, whose auto gamma filter silently
+        neighbor-averaged saturated integer pixels on load. Saturation
+        handling is now the caller's responsibility.
+        """
         image = np.full((32, 32), 100, dtype=np.uint16)
         image[10, 12] = 65535
         path = tmp_path / "saturated.tif"
@@ -104,18 +113,10 @@ class TestLoadHiddenSemantics:
 
         o_cgc = GeometryCorrection(list_files=[str(path)])
         o_cgc.load_files()
-        loaded = np.asarray(o_cgc.list_data[0])
-
-        # the saturated pixel is replaced by something neighborhood-like
-        assert loaded[10, 12] != 65535
-        assert np.isfinite(loaded[10, 12])
-        # everything else is untouched
-        untouched = np.ones_like(image, dtype=bool)
-        untouched[10, 12] = False
-        np.testing.assert_array_equal(loaded[untouched], np.full(untouched.sum(), 100, dtype=loaded.dtype))
+        np.testing.assert_array_equal(np.asarray(o_cgc.list_data[0]), image.astype(np.float32))
 
     def test_unsaturated_integer_image_loads_unchanged(self, tmp_path):
-        """assert the gamma filter is a no-op away from saturation"""
+        """assert integer TIFF data loads verbatim (as float32)"""
         rng = np.random.default_rng(42)
         image = rng.integers(0, 1000, size=(32, 32), dtype=np.uint16)
         path = tmp_path / "unsaturated.tif"
@@ -134,6 +135,46 @@ class TestLoadHiddenSemantics:
 
         o_cgc = GeometryCorrection(list_files=[str(path_a), str(path_b)])
         with pytest.raises(OSError):
+            o_cgc.load_files()
+
+    def test_unsupported_extension_raises(self, tmp_path):
+        """assert non-TIFF/FITS files are rejected up front"""
+        path = tmp_path / "image.png"
+        path.write_bytes(b"not really a png")
+
+        o_cgc = GeometryCorrection(list_files=[str(path)])
+        with pytest.raises(OSError, match="not supported"):
+            o_cgc.load_files()
+
+    def test_single_frame_3d_fits_is_squeezed(self, tmp_path):
+        """assert (1, H, W) FITS collapses to 2D, matching 1.x behavior"""
+        from astropy.io import fits as astropy_fits
+
+        data = np.arange(16 * 16, dtype=np.float64).reshape(1, 16, 16)
+        path = tmp_path / "stack1.fits"
+        astropy_fits.HDUList([astropy_fits.PrimaryHDU(data)]).writeto(str(path))
+
+        o_cgc = GeometryCorrection(list_files=[str(path)])
+        o_cgc.load_files()
+        loaded = np.asarray(o_cgc.list_data[0])
+        assert loaded.shape == (16, 16)
+        np.testing.assert_array_equal(loaded, data[0].astype(np.float32))
+
+    def test_multi_frame_stack_is_rejected(self, tmp_path):
+        """assert files that stay 3D after squeezing fail fast
+
+        Downstream code assumes 2D images; 1.x rejected multi-frame FITS
+        inside NeuNorm, and the direct loader must not silently regress to
+        passing 3D arrays through.
+        """
+        from astropy.io import fits as astropy_fits
+
+        data = np.arange(2 * 16 * 16, dtype=np.float64).reshape(2, 16, 16)
+        path = tmp_path / "stack2.fits"
+        astropy_fits.HDUList([astropy_fits.PrimaryHDU(data)]).writeto(str(path))
+
+        o_cgc = GeometryCorrection(list_files=[str(path)])
+        with pytest.raises(OSError, match="2D"):
             o_cgc.load_files()
 
 

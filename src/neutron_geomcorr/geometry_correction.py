@@ -41,8 +41,8 @@ from __future__ import annotations
 from typing import List, Optional, Union
 
 import numpy as np
-from NeuNorm.normalization import Normalization
 from numpy.typing import NDArray
+from tqdm.auto import tqdm
 
 
 class GeometryCorrection:
@@ -311,16 +311,52 @@ class GeometryCorrection:
             Whether to display a progress bar (for Jupyter notebooks).
             Default is False.
 
+        Raises
+        ------
+        OSError
+            If a file has an unsupported extension (TIFF/FITS only), does
+            not contain a single 2D image after squeezing, or its shape
+            does not match the previously loaded images.
+
         Notes
         -----
-        This method uses NeuNorm for loading TIFF and FITS files.
-        After loading, sets step1 flag to True.
+        TIFF files (``.tif``/``.tiff``) are read with tifffile; FITS files
+        (``.fits``/``.fit``/``.fts``) are read with astropy. All images are
+        returned as float32; singleton dimensions are squeezed away and the
+        result must be a single 2D image (multi-frame stacks are rejected).
+        Every image must have the same shape. After loading, sets step1
+        flag to True.
+
+        The progress bar is a ``tqdm.auto`` bar: a widget inside Jupyter,
+        a console bar elsewhere.
         """
-        o_norm = Normalization()
-        o_norm.load(file=self.list_files, notebook=notebook)
-        self.list_data = o_norm.data["sample"]["data"]
+        list_data = []
+        for _file in tqdm(self.list_files, desc="Loading", disable=not notebook, leave=False):
+            _lower = str(_file).lower()
+            if _lower.endswith((".tif", ".tiff")):
+                import tifffile
+
+                _data = tifffile.imread(_file)
+            elif _lower.endswith((".fits", ".fit", ".fts")):
+                from astropy.io import fits
+
+                with fits.open(_file, ignore_missing_end=True) as hdulist:
+                    _data = hdulist[0].data
+            else:
+                raise OSError(f"File format of {_file} is not supported (TIFF/FITS only)")
+
+            _image = np.squeeze(np.asarray(_data, dtype=np.float32))
+            if _image.ndim != 2:
+                raise OSError(
+                    f"{_file} does not contain a single 2D image "
+                    f"(shape {np.shape(_data)} after squeezing is {_image.ndim}D)"
+                )
+            if list_data and _image.shape != list_data[0].shape:
+                raise OSError("Shape of sample does not match previously loaded data set!")
+            list_data.append(_image)
+
+        self.list_data = list_data
         self.step1 = True
-        del o_norm
 
     def define_parameters(
         self,
@@ -469,23 +505,13 @@ class GeometryCorrection:
         Notes
         -----
         Results are stored in the list_data_corrected attribute.
+
+        The progress bar is a ``tqdm.auto`` bar: a widget inside Jupyter,
+        a console bar elsewhere.
         """
-        if notebook:
-            from IPython.display import display
-            from ipywidgets import widgets
-
-            progress_ui = widgets.IntProgress(max=len(self.list_files), description="Progress:")
-            display(progress_ui)
-
         self.list_data_corrected = []
-        for _index, _file in enumerate(self.list_data):
+        for _index in tqdm(range(len(self.list_data)), desc="Correcting", disable=not notebook, leave=False):
             self.list_data_corrected.append(self._correct_file_index(_index))
-
-            if notebook:
-                progress_ui.value = _index + 1
-
-        if notebook:
-            progress_ui.close()
 
     def general_correction(self, x: float = 0) -> float:
         """

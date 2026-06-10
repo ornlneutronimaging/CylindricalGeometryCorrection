@@ -28,10 +28,13 @@ maintainers = [
 dependencies = [
   # Dependencies available from both PyPI and conda
   "numpy>=1.20,<3",
-  # NeuNorm for neutron imaging normalization
-  "NeuNorm>=1.6.0,<2",
-  # h5py is required by NeuNorm but not declared as its dependency
-  "h5py",
+  # direct TIFF/FITS stack loading (replaced NeuNorm 1.x, which is
+  # superseded by the scipp-based 2.0 rewrite this package does not need;
+  # dropping it also drops the h5py workaround for its undeclared import)
+  "tifffile",
+  "astropy",
+  # progress bars (widget in Jupyter, console elsewhere)
+  "tqdm",
 ]
 
 [project.optional-dependencies]
@@ -118,6 +121,8 @@ scipy = "*"                     # Often needed for scientific computing
 matplotlib = "*"                # For visualization in notebooks
 plotly = ">=6.3.0,<7"
 tifffile = ">=2025.6.11,<2026"
+astropy = "*"                   # FITS loading in geometry_correction/file_handler
+tqdm = "*"                      # progress bars (tqdm.auto)
 pandas = ">=2.3.1,<3"
 scikit-image = ">=0.25.2,<0.26"
 pydantic = ">=2.11.7,<3"
@@ -140,7 +145,9 @@ setuptools = "*"   # Required for conda package building
 [tool.pixi.package.run-dependencies]
 python = ">=3.10"
 numpy = "*"
-neunorm = ">=1.6.0,<2"
+tifffile = "*"
+astropy = "*"
+tqdm = "*"
 
 [tool.pixi.package]
 name = "neutron-geomcorr"

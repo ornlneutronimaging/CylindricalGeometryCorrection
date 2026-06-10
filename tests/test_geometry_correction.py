@@ -254,6 +254,17 @@ class TestRun:
         assert "notebook" in inspect.signature(GeometryCorrection.load_files).parameters
         assert "notebook" in inspect.signature(GeometryCorrection.run).parameters
 
+    def test_load_files_notebook_kwarg_works_headless(self, homogeneous_tiff_files):
+        """assert notebook=True works outside Jupyter
+
+        The progress bar is tqdm.auto, which falls back to a console bar
+        when no notebook frontend is available, so notebook=True must not
+        raise in a headless environment.
+        """
+        o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files[:1])
+        o_cgc.load_files(notebook=True)
+        assert len(o_cgc.list_data) == 1
+
     def test_run_loads_and_defines_parameters(self, homogeneous_tiff_files):
         """assert run() loads data and stores the geometry parameters
 
