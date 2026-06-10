@@ -10,11 +10,14 @@ auto gamma filter on saturated integer data) are expected to be revisited
 
 import numpy as np
 import pytest
-import tifffile
-from PIL import Image
 
 from neutron_geomcorr import file_handler
 from neutron_geomcorr.geometry_correction import GeometryCorrection
+
+# I/O helpers for these contract tests; skip the module cleanly (instead of
+# erroring at collection) in environments where they are not installed
+tifffile = pytest.importorskip("tifffile", reason="tifffile is the independent TIFF reader for contract checks")
+Image = pytest.importorskip("PIL.Image", reason="Pillow writes the synthetic TIFF fixtures")
 
 
 def _load_tiff_independent(path):
@@ -28,7 +31,12 @@ def _load_tiff_independent(path):
 
 
 class TestLoadContract:
-    """Loaded pixel values must match an independent reader, byte for byte."""
+    """Loaded pixel values must match an independent reader.
+
+    Exactly for FITS (both paths go through astropy); within float32
+    round-off for TIFF, where load_files() yields float32 and the
+    independent reader compares in float64.
+    """
 
     @pytest.mark.parametrize(
         "subdir, filename",

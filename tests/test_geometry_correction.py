@@ -267,3 +267,7 @@ class TestRun:
         assert len(o_cgc.list_data) == len(homogeneous_tiff_files)
         assert o_cgc.pixel_center == 256
         assert o_cgc.outer_radius == 200
+        # run() does NOT apply the correction today; when the correctness fix
+        # makes run() call correct() (matching its docstring), this assertion
+        # must flip to assert the corrected data exists
+        assert o_cgc.list_data_corrected == []
