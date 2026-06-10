@@ -1,3 +1,5 @@
+import inspect
+
 import numpy as np
 import pytest
 
@@ -163,36 +165,30 @@ class TestHomogeneousCorrection:
         assert (_isolated_cylinder_calculated == _isolated_cylinder_expected).all()
         del o_cgc
 
-    def test_correction_intensity_4(self, tiff_data_dir):
-        """assert the correction works"""
-        tiff_image = [str(tiff_data_dir / "homogeneous_image_px_intensity_4.tif")]
-        o_cgc_4 = GeometryCorrection(list_files=tiff_image)
-        o_cgc_4.load_files()
-        pixel_center = 256
-        radius = 200
-        o_cgc_4.define_parameters(pixel_center=pixel_center, outer_radius=radius)
-        o_cgc_4.correct()
-        first_image_corrected4 = o_cgc_4.list_data_corrected[0]
-        row_10_returned = first_image_corrected4[10, :]
-        row_10_expected = np.ones(400) * 4
-        for _returned4, _expected4 in zip(row_10_returned, row_10_expected):
-            assert _returned4 == pytest.approx(_expected4, abs=0.1)
-        del o_cgc_4
+    @pytest.mark.parametrize("subdir, ext", [("tiff", ".tif"), ("fits", ".fits")])
+    @pytest.mark.parametrize("intensity", [2, 4, 6, 8])
+    def test_correction_flattens_homogeneous(self, test_data_dir, subdir, ext, intensity):
+        """assert the correction flattens homogeneous cylinders for both formats
 
-    def test_correction_intensity_2(self, tiff_data_dir):
-        """assert the correction works"""
-        tiff_image = [str(tiff_data_dir / "homogeneous_image_px_intensity_2.tif")]
-        o_cgc = GeometryCorrection(list_files=tiff_image)
+        Also encodes the output-shape contract: isolate_cylinder_from_image
+        extracts 2R+1 columns and _correct_file_index trims one column on each
+        side, so the corrected width is 2R-1. The previous zip()-based
+        comparison silently truncated and could not detect a width change.
+        """
+        path = test_data_dir / subdir / f"homogeneous_image_px_intensity_{intensity}{ext}"
+        o_cgc = GeometryCorrection(list_files=[str(path)])
         o_cgc.load_files()
         pixel_center = 256
         radius = 200
         o_cgc.define_parameters(pixel_center=pixel_center, outer_radius=radius)
         o_cgc.correct()
-        first_image_corrected = o_cgc.list_data_corrected[0]
-        row_10_returned = first_image_corrected[10, :]
-        row_10_expected = np.ones(400) * 2
-        for _returned, _expected in zip(row_10_returned, row_10_expected):
-            assert _returned == pytest.approx(_expected, abs=0.1)
+        corrected = o_cgc.list_data_corrected[0]
+
+        assert corrected.shape == (512, 2 * radius - 1)
+        # edge deviation scales with intensity (~2.5% of the flat value at the
+        # cylinder rim), so the tolerance must be relative; the historical
+        # abs=0.1 only ever held for intensities 2 and 4
+        np.testing.assert_allclose(corrected[10, :], np.full(2 * radius - 1, float(intensity)), rtol=0.03)
 
 
 class TestInhomogeneousCorrection:
@@ -230,34 +226,44 @@ class TestInhomogeneousCorrection:
         _isolated_cylinder_expected = image_0[:, pixel_center - outer_radius : pixel_center + outer_radius + 1]
         assert (_isolated_cylinder_calculated == _isolated_cylinder_expected).all()
 
-    def test_correction_intensity_2(self, tiff_data_dir):
-        """assert the correction works for inhomogeneous sample of intensity 2"""
-        tiff_image = [str(tiff_data_dir / "inhomogeneous_image_px_intensity_2.tif")]
-        o_cgc = GeometryCorrection(list_files=tiff_image)
+    @pytest.mark.parametrize("subdir, ext", [("tiff", ".tif"), ("fits", ".fits")])
+    @pytest.mark.parametrize("intensity", [2, 4, 6, 8])
+    def test_correction_flattens_inhomogeneous(self, test_data_dir, subdir, ext, intensity):
+        """assert the correction flattens hollow cylinders for both formats"""
+        path = test_data_dir / subdir / f"inhomogeneous_image_px_intensity_{intensity}{ext}"
+        o_cgc = GeometryCorrection(list_files=[str(path)])
         o_cgc.load_files()
         pixel_center = 256
         outer_radius = 200
         inner_radius = 150
         o_cgc.define_parameters(pixel_center=pixel_center, outer_radius=outer_radius, inner_radius=inner_radius)
         o_cgc.correct()
-        first_image_corrected = o_cgc.list_data_corrected[0]
-        row_10_returned = first_image_corrected[10, :]
-        row_10_expected = np.ones(400) * 2
-        for _returned, _expected in zip(row_10_returned, row_10_expected):
-            assert _returned == pytest.approx(_expected, abs=0.1)
+        corrected = o_cgc.list_data_corrected[0]
 
-    def test_correction_intensity_4(self, tiff_data_dir):
-        """assert the correction works for inhomogeneous sample of intensity 4"""
-        tiff_image = [str(tiff_data_dir / "inhomogeneous_image_px_intensity_4.tif")]
-        o_cgc = GeometryCorrection(list_files=tiff_image)
-        o_cgc.load_files()
-        pixel_center = 256
-        outer_radius = 200
-        inner_radius = 150
-        o_cgc.define_parameters(pixel_center=pixel_center, outer_radius=outer_radius, inner_radius=inner_radius)
-        o_cgc.correct()
-        first_image_corrected = o_cgc.list_data_corrected[0]
-        row_10_returned = first_image_corrected[10, :]
-        row_10_expected = np.ones(400) * 4
-        for _returned, _expected in zip(row_10_returned, row_10_expected):
-            assert _returned == pytest.approx(_expected, abs=0.1)
+        assert corrected.shape == (512, 2 * outer_radius - 1)
+        np.testing.assert_allclose(corrected[10, :], np.full(2 * outer_radius - 1, float(intensity)), rtol=0.03)
+
+
+class TestRun:
+    def test_run_and_load_files_keep_notebook_kwarg(self):
+        """assert the notebook progress-bar kwarg stays part of the public API
+
+        All six tutorial notebooks call load_files(notebook=True); no other
+        test exercises the kwarg, so a loader rewrite could silently drop it.
+        """
+        assert "notebook" in inspect.signature(GeometryCorrection.load_files).parameters
+        assert "notebook" in inspect.signature(GeometryCorrection.run).parameters
+
+    def test_run_loads_and_defines_parameters(self, homogeneous_tiff_files):
+        """assert run() loads data and stores the geometry parameters
+
+        Characterization: run() currently does NOT apply the correction even
+        though its docstring says it does (tracked for the correctness PR);
+        this test pins what run() actually does today.
+        """
+        o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files)
+        o_cgc.run(pixel_center=256, outer_radius=200)
+
+        assert len(o_cgc.list_data) == len(homogeneous_tiff_files)
+        assert o_cgc.pixel_center == 256
+        assert o_cgc.outer_radius == 200
