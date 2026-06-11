@@ -53,7 +53,7 @@ except ImportError:
 
 
 def make_fits(
-    data: NDArray[np.float64], filename: Union[str, Path], overwrite: bool = True, allow_nan: bool = True
+    data: NDArray[np.number], filename: Union[str, Path], overwrite: bool = True, allow_nan: bool = True
 ) -> None:
     """
     Create a FITS file from numpy array data.
@@ -112,7 +112,7 @@ def make_fits(
 
 
 def make_tiff(
-    data: NDArray[np.float64], filename: Union[str, Path], overwrite: bool = True, allow_nan: bool = True
+    data: NDArray[np.number], filename: Union[str, Path], overwrite: bool = True, allow_nan: bool = True
 ) -> None:
     """
     Create a TIFF file from numpy array data.
