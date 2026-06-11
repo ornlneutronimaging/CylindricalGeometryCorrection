@@ -79,6 +79,30 @@ class TestFitsOperations(TestFileHandler):
         with pytest.raises(FileNotFoundError):
             file_handler.load_fits(temp_dir / "nonexistent.fits")
 
+    def test_load_fits_squeezes_singleton_cube(self, temp_dir):
+        """L4: a (1, H, W) cube is a single 2D image and must load as one"""
+        if not file_handler.HAS_ASTROPY:
+            pytest.skip("astropy not installed")
+        from astropy.io import fits
+
+        filename = temp_dir / "cube1.fits"
+        fits.PrimaryHDU(np.random.rand(1, 16, 16)).writeto(filename)
+
+        loaded = file_handler.load_fits(filename)
+        assert loaded.shape == (16, 16)
+
+    def test_load_fits_rejects_multiframe_cube(self, temp_dir):
+        """L4: the documented contract is a single 2D image"""
+        if not file_handler.HAS_ASTROPY:
+            pytest.skip("astropy not installed")
+        from astropy.io import fits
+
+        filename = temp_dir / "cube3.fits"
+        fits.PrimaryHDU(np.random.rand(3, 16, 16)).writeto(filename)
+
+        with pytest.raises(ValueError, match="2D"):
+            file_handler.load_fits(filename)
+
     def test_make_fits_invalid_data(self, temp_dir):
         """Test make_fits with invalid data."""
         if not file_handler.HAS_ASTROPY:
@@ -100,18 +124,12 @@ class TestTiffOperations(TestFileHandler):
 
     def test_make_tiff_creates_file(self, sample_data, temp_dir):
         """Test that make_tiff creates a file."""
-        if not file_handler.HAS_PIL:
-            pytest.skip("Pillow not installed")
-
         filename = temp_dir / "test.tif"
         file_handler.make_tiff(sample_data, filename)
         assert filename.exists()
 
     def test_make_tiff_overwrite(self, sample_data, temp_dir):
         """Test overwrite behavior of make_tiff."""
-        if not file_handler.HAS_PIL:
-            pytest.skip("Pillow not installed")
-
         filename = temp_dir / "test.tif"
 
         # Create file
@@ -125,11 +143,8 @@ class TestTiffOperations(TestFileHandler):
         with pytest.raises(FileExistsError):
             file_handler.make_tiff(sample_data, filename, overwrite=False)
 
-    def test_load_tiff_returns_data(self, sample_data, temp_dir):
-        """Test that load_tiff returns data."""
-        if not file_handler.HAS_PIL:
-            pytest.skip("Pillow not installed")
-
+    def test_load_tiff_returns_correct_data(self, sample_data, temp_dir):
+        """Test that load_tiff returns the written pixel values."""
         filename = temp_dir / "test.tif"
         file_handler.make_tiff(sample_data, filename)
 
@@ -137,21 +152,29 @@ class TestTiffOperations(TestFileHandler):
 
         assert loaded_data.shape == sample_data.shape
         assert loaded_data.dtype == np.float64
-        # Note: TIFF conversion may lose precision due to uint16 conversion
+        # float data is stored as float32, so the round trip is exact to
+        # float32 precision — previously it came back min-max stretched
+        # to [0, 65535]
+        np.testing.assert_allclose(loaded_data, sample_data, rtol=1e-6)
 
     def test_load_tiff_file_not_found(self, temp_dir):
         """Test load_tiff with non-existent file."""
-        if not (file_handler.HAS_MATPLOTLIB or file_handler.HAS_PIL):
-            pytest.skip("Neither matplotlib nor Pillow installed")
-
         with pytest.raises(FileNotFoundError):
             file_handler.load_tiff(temp_dir / "nonexistent.tif")
 
+    def test_load_tiff_rejects_multiframe_stack(self, temp_dir):
+        """L4: the documented contract is a single 2D image"""
+        import tifffile
+
+        filename = temp_dir / "stack.tif"
+        # photometric: keep the 3-frame stack grayscale; tifffile would
+        # otherwise guess RGB from the leading 3 and warn
+        tifffile.imwrite(filename, np.random.rand(3, 16, 16).astype(np.float32), photometric="minisblack")
+        with pytest.raises(ValueError, match="2D"):
+            file_handler.load_tiff(filename)
+
     def test_make_tiff_invalid_data(self, temp_dir):
         """Test make_tiff with invalid data."""
-        if not file_handler.HAS_PIL:
-            pytest.skip("Pillow not installed")
-
         filename = temp_dir / "test.tif"
 
         # 1D array should raise error
@@ -164,20 +187,17 @@ class TestTiffOperations(TestFileHandler):
 
     def test_make_tiff_different_dtypes(self, temp_dir):
         """Test make_tiff with different data types."""
-        if not file_handler.HAS_PIL:
-            pytest.skip("Pillow not installed")
-
         filename = temp_dir / "test.tif"
 
-        # Test with uint8
+        # uint8 round-trips exactly with its dtype unchanged on disk
         data_uint8 = np.random.randint(0, 255, (50, 50), dtype=np.uint8)
         file_handler.make_tiff(data_uint8, filename)
-        assert filename.exists()
+        np.testing.assert_array_equal(file_handler.load_tiff(filename), data_uint8.astype(np.float64))
 
-        # Test with float64
+        # float64 round-trips to float32 precision
         data_float = np.random.rand(50, 50)
         file_handler.make_tiff(data_float, filename, overwrite=True)
-        assert filename.exists()
+        np.testing.assert_allclose(file_handler.load_tiff(filename), data_float, rtol=1e-6)
 
 
 class TestUtilityFunctions(TestFileHandler):
@@ -228,6 +248,12 @@ class TestUtilityFunctions(TestFileHandler):
         with pytest.raises(ValueError, match="non-finite"):
             file_handler.validate_image_data(data_with_inf)
 
+    def test_validate_image_data_allow_nan(self):
+        """L4: non-finite values pass when explicitly allowed"""
+        data_with_nan = np.ones((10, 10))
+        data_with_nan[5, 5] = np.nan
+        file_handler.validate_image_data(data_with_nan, allow_nan=True)  # no error
+
 
 class TestRoundTrip(TestFileHandler):
     """Test round-trip save and load operations."""
@@ -251,9 +277,6 @@ class TestRoundTrip(TestFileHandler):
 
     def test_tiff_round_trip_uint8(self, temp_dir):
         """Test TIFF save and load round trip with uint8 data."""
-        if not file_handler.HAS_PIL:
-            pytest.skip("Pillow not installed")
-
         # Create uint8 data
         data_uint8 = np.random.randint(0, 255, (100, 100), dtype=np.uint8)
         filename = temp_dir / "roundtrip.tif"
@@ -264,9 +287,33 @@ class TestRoundTrip(TestFileHandler):
         # Load data
         loaded_data = file_handler.load_tiff(filename)
 
-        # Check shape and type
-        assert loaded_data.shape == data_uint8.shape
+        # Values survive exactly; load_tiff converts to float64
         assert loaded_data.dtype == np.float64
+        np.testing.assert_array_equal(loaded_data, data_uint8.astype(np.float64))
+
+    def test_nan_bearing_data_round_trips(self, temp_dir):
+        """L4: legitimately corrected data can contain NaN pixels and must
+        be saveable; FITS and float TIFF both store NaN natively. The
+        previous validation rejected it unconditionally."""
+        data = np.random.rand(32, 32)
+        data[3, 7] = np.nan
+
+        tiff_name = temp_dir / "nan.tif"
+        file_handler.make_tiff(data, tiff_name)
+        loaded_tiff = file_handler.load_tiff(tiff_name)
+        np.testing.assert_allclose(loaded_tiff, data, rtol=1e-6)
+        assert np.isnan(loaded_tiff[3, 7])
+
+        if file_handler.HAS_ASTROPY:
+            fits_name = temp_dir / "nan.fits"
+            file_handler.make_fits(data, fits_name)
+            loaded_fits = file_handler.load_fits(fits_name)
+            np.testing.assert_allclose(loaded_fits, data)
+            assert np.isnan(loaded_fits[3, 7])
+
+        # opting back into strict validation still works
+        with pytest.raises(ValueError, match="non-finite"):
+            file_handler.make_tiff(data, temp_dir / "strict.tif", allow_nan=False)
 
 
 class TestErrorHandling(TestFileHandler):
@@ -282,101 +329,71 @@ class TestErrorHandling(TestFileHandler):
         with pytest.raises(ImportError, match="astropy is required"):
             file_handler.load_fits(temp_dir / "test.fits")
 
-    def test_missing_pil_import(self, temp_dir, monkeypatch):
-        """Test error when PIL is not available."""
-        monkeypatch.setattr(file_handler, "HAS_PIL", False)
+    def test_missing_tifffile_import(self, temp_dir, monkeypatch):
+        """Test error when tifffile is not available."""
+        monkeypatch.setattr(file_handler, "HAS_TIFFFILE", False)
 
-        with pytest.raises(ImportError, match="Pillow is required"):
+        with pytest.raises(ImportError, match="tifffile is required"):
             file_handler.make_tiff(np.random.rand(10, 10), temp_dir / "test.tif")
 
-    def test_missing_both_tiff_libs(self, temp_dir, monkeypatch):
-        """Test error when neither matplotlib nor PIL is available for TIFF."""
-        # Create a dummy file first
-        dummy_file = temp_dir / "test.tif"
-        dummy_file.write_text("dummy")
-
-        monkeypatch.setattr(file_handler, "HAS_MATPLOTLIB", False)
-        monkeypatch.setattr(file_handler, "HAS_PIL", False)
-
-        with pytest.raises(ImportError, match="matplotlib or Pillow"):
-            file_handler.load_tiff(dummy_file)
+        with pytest.raises(ImportError, match="tifffile is required"):
+            file_handler.load_tiff(temp_dir / "test.tif")
 
 
-class TestLoadTiffPilBranch(TestFileHandler):
-    """Pin the relationship between load_tiff's two code paths."""
+class TestLoadTiffFloatData(TestFileHandler):
+    """load_tiff must return pixel data for the float TIFFs this project
+    itself produces.
 
-    def test_pil_fallback_matches_matplotlib_for_uint16(self, temp_dir, monkeypatch):
-        """assert both load_tiff code paths agree on integer TIFFs"""
-        if not (file_handler.HAS_MATPLOTLIB and file_handler.HAS_PIL):
-            pytest.skip("both matplotlib and Pillow required for this comparison")
-        from PIL import Image
+    The previous matplotlib.image.imread path returned an RGBA uint8
+    render — not the data — for float (mode 'F') TIFFs, including the
+    repo's own fixtures (pinned as a characterization test before this
+    fix)."""
 
-        data = np.arange(64 * 64, dtype=np.uint16).reshape(64, 64)
-        filename = temp_dir / "u16.tif"
-        Image.fromarray(data).save(str(filename))
-
-        via_matplotlib = file_handler.load_tiff(filename)
-        monkeypatch.setattr(file_handler, "HAS_MATPLOTLIB", False)
-        via_pil = file_handler.load_tiff(filename)
-
-        assert via_pil.dtype == np.float64
-        np.testing.assert_allclose(via_pil, via_matplotlib, rtol=1e-6)
-
-    def test_matplotlib_path_mangles_float_tiff(self, tiff_data_dir, monkeypatch):
-        """Characterization of a real bug: the default (matplotlib) path
-        returns an RGBA uint8 render -- not the data -- for the float
-        (mode 'F') TIFFs this project itself produces and ships as fixtures.
-        The PIL fallback returns the true 2D float data. Tracked for the
-        file_handler fix PR; this test pins today's broken behavior so the
-        fix is explicit.
-        """
-        if not (file_handler.HAS_MATPLOTLIB and file_handler.HAS_PIL):
-            pytest.skip("both matplotlib and Pillow required for this comparison")
-
+    def test_float_fixture_loads_as_2d_data(self, tiff_data_dir):
         filename = tiff_data_dir / "homogeneous_image_px_intensity_4.tif"
-        via_matplotlib = file_handler.load_tiff(filename)
-        monkeypatch.setattr(file_handler, "HAS_MATPLOTLIB", False)
-        via_pil = file_handler.load_tiff(filename)
+        loaded = file_handler.load_tiff(filename)
 
-        # the PIL path returns the documented contract (2D data)...
-        assert via_pil.ndim == 2
-        # ...while the default path currently violates it (RGBA, 0-255)
-        assert via_matplotlib.ndim == 3
-        assert via_matplotlib.shape[-1] == 4
+        assert loaded.ndim == 2
+        assert loaded.dtype == np.float64
+        # the fixture encodes a thickness-proportional cylinder with center
+        # value intensity * diameter; RGBA renders are capped at 255
+        assert loaded.max() > 255
+
+    def test_pil_written_float_tiff_round_trips(self, temp_dir):
+        """cross-engine check: a mode-'F' TIFF written by an independent
+        library (Pillow) comes back through load_tiff as the true data"""
+        pil_image = pytest.importorskip("PIL.Image", reason="Pillow writes the cross-check fixture")
+
+        data = np.linspace(0.5, 2.5, 64 * 64, dtype=np.float32).reshape(64, 64)
+        filename = temp_dir / "pil_float.tif"
+        pil_image.fromarray(data, mode="F").save(str(filename))
+
+        loaded = file_handler.load_tiff(filename)
+        np.testing.assert_allclose(loaded, data, rtol=1e-6)
 
 
-class TestMakeTiffFloatNormalization(TestFileHandler):
-    """Characterization: make_tiff min-max rescales float data to uint16.
+class TestMakeTiffFloatPreservesScale(TestFileHandler):
+    """make_tiff must preserve the quantitative scale of float data.
 
-    The original scale and offset are discarded (every image gets its own
-    stretch), which silently destroys the quantitative scale of corrected
-    transmission data. Pinned here so the planned fix (native float TIFF)
-    changes this consciously.
-    """
+    The previous implementation min-max rescaled every float image to
+    uint16 by its own extrema, silently destroying scale and offset —
+    per-TOF-bin corrected stacks each got a different undisclosed
+    stretch (audit M6)."""
 
-    def test_float_data_is_minmax_rescaled_to_uint16(self, temp_dir):
-        if not file_handler.HAS_PIL:
-            pytest.skip("Pillow not installed")
-
+    def test_float_data_round_trips_with_scale(self, temp_dir):
         data = np.linspace(0.5, 2.5, 64 * 64, dtype=np.float64).reshape(64, 64)
-        filename = temp_dir / "float_rescaled.tif"
+        filename = temp_dir / "float_native.tif"
         file_handler.make_tiff(data, filename)
         loaded = file_handler.load_tiff(filename)
 
-        # quantitative values are gone: full min-max stretch to [0, 65535]
-        assert loaded.min() == 0.0
-        assert loaded.max() == 65535.0
-        expected = ((data - data.min()) / (data.max() - data.min()) * 65535).astype(np.uint16)
-        np.testing.assert_allclose(loaded, expected.astype(np.float64), atol=1.0)
+        # native float32 on disk: values keep their physical scale
+        np.testing.assert_allclose(loaded, data, rtol=1e-6)
 
-    def test_constant_float_image_becomes_all_zeros(self, temp_dir):
-        """assert the degenerate constant-image branch zeroes everything"""
-        if not file_handler.HAS_PIL:
-            pytest.skip("Pillow not installed")
-
+    def test_constant_float_image_keeps_its_value(self, temp_dir):
+        """the degenerate constant-image branch previously zeroed everything"""
         data = np.full((32, 32), 7.5, dtype=np.float64)
         filename = temp_dir / "constant.tif"
         file_handler.make_tiff(data, filename)
         loaded = file_handler.load_tiff(filename)
 
-        np.testing.assert_array_equal(loaded, np.zeros((32, 32), dtype=np.float64))
+        np.testing.assert_array_equal(loaded, data)

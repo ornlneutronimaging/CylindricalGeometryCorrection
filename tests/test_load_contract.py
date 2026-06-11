@@ -24,11 +24,10 @@ Image = pytest.importorskip("PIL.Image", reason="Pillow writes the synthetic TIF
 
 
 def _load_tiff_independent(path):
-    """Independent TIFF reader for contract checks.
-
-    Deliberately tifffile, NOT file_handler.load_tiff: the latter's default
-    matplotlib path returns an RGBA uint8 array for the float (mode 'F')
-    TIFFs this project uses (tracked for the file_handler fix PR).
+    """Reference TIFF reader for contract checks: raw pixel data via
+    tifffile, no rendering. (file_handler.load_tiff historically read
+    through matplotlib, which returned an RGBA render for float TIFFs —
+    fixed since, but the contract check stays on the raw reader.)
     """
     return np.asarray(tifffile.imread(str(path)), dtype=np.float64)
 
