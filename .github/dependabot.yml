@@ -18,6 +18,11 @@ updates:
       include: "scope"
     pull-request-branch-name:
       separator: "-"
+    # one grouped PR per week instead of one PR per action bump
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
 
   # Keep Python dependencies up to date (for awareness, actual updates via pixi)
   - package-ecosystem: "pip"

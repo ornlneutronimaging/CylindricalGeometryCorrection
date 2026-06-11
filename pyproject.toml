@@ -86,13 +86,13 @@ default-tag = "0.1.0"
 method = "minor"
 
 [tool.versioningit.format]
-distance = "{next_version}.dev{distance}"
+distance = "{next_version}.dev{committer_date:%Y%m%d%H%M%S}"
 # Since pixi builds currently require the package version to be set statically in pyproject.toml,
 # and we solve that by temporarily changing pyproject.toml during build using the pixi tasks
 # sync-version and reset-toml, then we need to ignore uncommitted changes in order for the wheel
 # version to be consistent with the package version
 dirty = "{version}"
-distance-dirty = "{next_version}.dev{distance}"
+distance-dirty = "{next_version}.dev{committer_date:%Y%m%d%H%M%S}"
 
 [tool.versioningit.write]
 file = "src/neutron_geomcorr/_version.py"
@@ -175,7 +175,7 @@ pytest-repeat = "*"
 pytest-xdist = "*"
 
 [tool.pixi.feature.package.dependencies]
-anaconda-client = ">=1.13.0,<2"
+# anaconda-client dropped: conda-publish uploads via `pixi upload` (built in)
 twine = ">=6.1.0,<7"
 versioningit = "*"
 hatch = "*"
@@ -223,7 +223,7 @@ conda-build = { description = "Build the conda package", depends-on = [
   "conda-build-command",
   "reset-toml",
 ] }
-conda-publish = { cmd = "anaconda upload *.conda", description = "Publish the .conda package to anaconda.org", depends-on = [
+conda-publish = { cmd = "pixi upload anaconda --owner neutronimaging *.conda", description = "Publish the .conda package to the neutronimaging channel on anaconda.org", depends-on = [
   "conda-build",
 ] }
 # Misc
