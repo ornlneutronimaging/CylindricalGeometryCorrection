@@ -140,6 +140,9 @@ class GeometryCorrection:
 
         Raises
         ------
+        OSError
+            Propagated from load_files(): empty list_files, unsupported
+            file extension, non-2D image data, or mismatched image shapes.
         ValueError
             If pixel_center is not a positive integer within image bounds.
         ValueError
