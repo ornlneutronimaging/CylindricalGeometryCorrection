@@ -9,9 +9,9 @@ ignore:
   # listed there are not installed software in this environment and cannot be
   # upgraded from this repo; upstream tracks them in jupyterlab releases.
   - package:
-      location: "*/site-packages/jupyterlab/staging/yarn.lock"
+      location: "**/site-packages/jupyterlab/staging/yarn.lock"
   - package:
-      location: "*/site-packages/jupyterlab/tests/mock_packages/*"
+      location: "**/site-packages/jupyterlab/tests/mock_packages/**"
 
   # CPython 3.14.5 is the newest conda-forge build today (2026-06-11); these
   # are fixed upstream but no packaged fix is installable yet. Remove these
