@@ -1,0 +1,49 @@
+name: Manual conda publish
+
+# operational escape hatch: re-publish the conda artifact from a previous
+# "Package and Deployment" run (e.g. when the publish job failed after a
+# successful build, as on v2.0.0). The artifact is fetched cross-run, so the
+# package content is exactly what that run built and verified.
+on:
+  workflow_dispatch:
+    inputs:
+      run-id:
+        description: Run ID of the Package and Deployment run that built the artifact
+        required: true
+      label:
+        description: Anaconda channel label (main, rc, dev)
+        required: true
+        default: main
+
+permissions:
+  contents: read
+  actions: read # cross-run artifact download
+
+jobs:
+  publish:
+    name: Upload package to anaconda
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
+        with:
+          manifest-path: pyproject.toml
+          run-install: false
+
+      - name: Download conda package artifact from source run
+        uses: actions/download-artifact@v8
+        with:
+          name: artifact-conda-package
+          run-id: ${{ inputs.run-id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload package to anaconda
+        uses: neutrons/conda-actions/publish@bba9ca89d48d9ae846db9650cc63fde736340b3d # v2
+        with:
+          anaconda-token: ${{ secrets.ANACONDA_TOKEN }}
+          organization: neutronimaging
+          label: ${{ inputs.label }}
+          package-path: neutron-geomcorr-*.conda
