@@ -44,14 +44,18 @@ environment.
   the two edge columns (zero chord length) are trimmed.
 - TIFF/FITS loading is direct tifffile/astropy (NeuNorm was removed in #58;
   this package does not need the scipp-based NeuNorm 2.0).
-- `documentation/derivation.md` describes the *intended* Beer-Lambert
+- `documentation/source/derivation.md` describes the *intended* Beer-Lambert
   correction; the implemented correction is linear chord-length division —
   reconciling them is tracked in issue #57. Do not present the docs and the
   code as equivalent.
-- Notebooks: tutorial notebooks under `notebooks/` are committed WITH executed
-  outputs so users browsing GitHub see expected results; dev notebooks should
-  stay output-free and small (`check-added-large-files` is capped high for
-  historical reasons — do not add more large notebooks).
+- Notebooks: ALL committed notebooks (tutorials AND the dev_* series) carry
+  executed outputs — users browse them on GitHub without an environment, so
+  an output-free notebook serves no purpose. NEVER clear outputs; when they
+  go stale, re-execute them (or ask the maintainer). Stripping invisible
+  `metadata.widgets` state is fine. The large-file cap deliberately
+  accommodates the ~26 MB executed dev_elaborate notebook.
+- `documentation/source/derivation.md` line discipline: semantic lining (one
+  sentence per line) for any new or edited prose.
 - Tests must not depend on optional viz packages; image fixtures live in
   `tests/data/` (a real directory — it replaced an earlier symlink into
   `notebooks/data`, which broke Windows checkouts).

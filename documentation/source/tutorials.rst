@@ -1,7 +1,19 @@
 Tutorials
 =========
 
-The following tutorials demonstrate how to use the neutron-geomcorr package for cylindrical geometry correction:
+The following tutorials demonstrate how to use the neutron-geomcorr package for cylindrical geometry correction.
+All committed notebooks (tutorials and the ``notebooks/dev_*`` development series alike) carry executed outputs,
+so they can be browsed on GitHub without setting up an environment.
+
+Step-by-step series (FITS)
+--------------------------
+
+A four-part walkthrough splitting loading and correction into separate notebooks:
+
+* `tutorial00 — loading a homogeneous dataset <https://github.com/ornlneutronimaging/CylindricalGeometryCorrection/blob/next/notebooks/tutorial00_homogeneous_loading.ipynb>`_
+* `tutorial01 — correcting a homogeneous cylinder <https://github.com/ornlneutronimaging/CylindricalGeometryCorrection/blob/next/notebooks/tutorial01_homogeneous_apply.ipynb>`_
+* `tutorial02 — loading an inhomogeneous (hollow) dataset <https://github.com/ornlneutronimaging/CylindricalGeometryCorrection/blob/next/notebooks/tutorial02_inhomogeneous_loading.ipynb>`_
+* `tutorial03 — correcting an inhomogeneous cylinder <https://github.com/ornlneutronimaging/CylindricalGeometryCorrection/blob/next/notebooks/tutorial03_inhomogeneous_apply.ipynb>`_
 
 Homogeneous Cylinder Tutorial
 ------------------------------

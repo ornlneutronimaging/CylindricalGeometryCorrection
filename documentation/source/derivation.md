@@ -1,5 +1,13 @@
 # Cylindrical Geometry Correction for Transmission Data
 
+```{important}
+**Status: design document, not yet implemented.**
+This page derives the Beer-Lambert (exponential) correction with per-TOF μ estimation.
+The correction currently implemented in `neutron_geomcorr` is a **linear chord-length division** (see {doc}`introduction`), which is valid only for inputs proportional to path length (attenuation, −ln(T), or thickness maps) — not for raw transmission data.
+Reconciling the two — implementing this derivation or re-scoping the package documentation — is tracked in [issue #57](https://github.com/ornlneutronimaging/CylindricalGeometryCorrection/issues/57).
+The algorithm below is prototyped in `notebooks/00_development.ipynb`.
+```
+
 This document presents the methodology for applying cylindrical geometry correction to transmission data, specifically in the context of neutron or X-ray imaging where Beer-Lambert law governs the attenuation of intensity through a material.
 
 ---
@@ -51,7 +59,7 @@ In practice, ideal background measurements $ I_0 $ may not be available or may b
 
 ---
 
-#### Method 1: Discrete Method (Two-Column Approach)
+### Method 1: Discrete Method (Two-Column Approach)
 
 This method leverages transmission values at two distinct positions $ x_1 $ and $ x_2 $ on the cylinder to estimate a physically meaningful attenuation coefficient.
 
@@ -77,7 +85,7 @@ $$
 
 ---
 
-#### Method 2: Iterative Method (Global Regression with Nuisance Term)
+### Method 2: Iterative Method (Global Regression with Nuisance Term)
 
 An alternative approach involves performing a global regression across all spatial positions $ x $ to estimate $ \mu $ while accounting for nuisance parameters (such as background fluctuations or instrumental effects). This iterative method fits the model:
 

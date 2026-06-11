@@ -1,5 +1,8 @@
 # Project specific
 .ipynb*
+# local scratch notebooks at the repo root (dev.ipynb, dev_prototype.ipynb, ...);
+# real dev notebooks belong under notebooks/ with cleared outputs
+/dev*.ipynb
 /docs/_build/*
 *.egg-info*/
 /dist/*

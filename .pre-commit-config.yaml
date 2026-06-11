@@ -4,6 +4,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
+        # committed notebooks carry executed outputs by repo convention (they
+        # are read on GitHub without an environment); the largest legitimate
+        # file is the executed dev_elaborate notebook at ~26 MB
         args: [--maxkb=30000]
       - id: check-json
       - id: check-merge-conflict

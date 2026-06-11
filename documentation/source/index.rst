@@ -13,6 +13,7 @@ Welcome to CylindricalGeometryCorrection's documentation!
    installation
    introduction
    tutorials
+   derivation
 
 
 Indices and tables
