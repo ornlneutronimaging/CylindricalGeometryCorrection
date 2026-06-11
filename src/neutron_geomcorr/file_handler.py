@@ -44,23 +44,17 @@ except ImportError:
     fits = None
 
 try:
-    from PIL import Image
+    import tifffile
 
-    HAS_PIL = True
+    HAS_TIFFFILE = True
 except ImportError:
-    HAS_PIL = False
-    Image = None
-
-try:
-    import matplotlib.image as mpimg
-
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
-    mpimg = None
+    HAS_TIFFFILE = False
+    tifffile = None
 
 
-def make_fits(data: NDArray[np.float64], filename: Union[str, Path], overwrite: bool = True) -> None:
+def make_fits(
+    data: NDArray[np.number], filename: Union[str, Path], overwrite: bool = True, allow_nan: bool = True
+) -> None:
     """
     Create a FITS file from numpy array data.
 
@@ -72,6 +66,10 @@ def make_fits(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
         Path to the output FITS file.
     overwrite : bool, optional
         Whether to overwrite existing file. Default is True.
+    allow_nan : bool, optional
+        Whether to accept non-finite values (NaN/inf). Default is True:
+        FITS stores NaN natively, and legitimately corrected data can
+        contain NaN pixels. Set to False to reject such data.
 
     Raises
     ------
@@ -80,7 +78,8 @@ def make_fits(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
     FileExistsError
         If file exists and overwrite is False.
     ValueError
-        If data is not a 2D array.
+        If data is not a 2D array, or contains non-finite values while
+        allow_nan is False.
 
     Examples
     --------
@@ -96,7 +95,7 @@ def make_fits(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
     if not HAS_ASTROPY:
         raise ImportError("astropy is required for FITS file operations. Install it with: pip install astropy")
 
-    validate_image_data(data)
+    validate_image_data(data, allow_nan=allow_nan)
 
     filename = Path(filename)
 
@@ -112,7 +111,9 @@ def make_fits(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
     hdulist.close()
 
 
-def make_tiff(data: NDArray[np.float64], filename: Union[str, Path], overwrite: bool = True) -> None:
+def make_tiff(
+    data: NDArray[np.number], filename: Union[str, Path], overwrite: bool = True, allow_nan: bool = True
+) -> None:
     """
     Create a TIFF file from numpy array data.
 
@@ -124,15 +125,20 @@ def make_tiff(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
         Path to the output TIFF file.
     overwrite : bool, optional
         Whether to overwrite existing file. Default is True.
+    allow_nan : bool, optional
+        Whether to accept non-finite values (NaN/inf). Default is True:
+        float TIFF stores NaN natively, and legitimately corrected data
+        can contain NaN pixels. Set to False to reject such data.
 
     Raises
     ------
     ImportError
-        If PIL/Pillow is not installed.
+        If tifffile is not installed.
     FileExistsError
         If file exists and overwrite is False.
     ValueError
-        If data is not a 2D array.
+        If data is not a 2D array, or contains non-finite values while
+        allow_nan is False.
 
     Examples
     --------
@@ -142,17 +148,16 @@ def make_tiff(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
 
     Notes
     -----
-    This function requires the Pillow package to be installed.
-    Install it with: pip install Pillow
-
-    The data will be converted to appropriate dtype for TIFF format.
-    For floating point data, consider scaling to 0-65535 range for
-    16-bit TIFF or 0-255 for 8-bit TIFF.
+    Float data is written as a native 32-bit float TIFF, preserving the
+    quantitative scale (and staying readable by ImageJ, which has no
+    64-bit float support); integer data is written with its dtype
+    unchanged. Earlier versions min-max rescaled float data to uint16
+    per image, silently discarding scale and offset.
     """
-    if not HAS_PIL:
-        raise ImportError("Pillow is required for TIFF file operations. Install it with: pip install Pillow")
+    if not HAS_TIFFFILE:
+        raise ImportError("tifffile is required for TIFF file operations. Install it with: pip install tifffile")
 
-    validate_image_data(data)
+    validate_image_data(data, allow_nan=allow_nan)
 
     filename = Path(filename)
 
@@ -162,23 +167,10 @@ def make_tiff(data: NDArray[np.float64], filename: Union[str, Path], overwrite: 
         else:
             raise FileExistsError(f"File {filename} already exists")
 
-    # Handle different data types appropriately
-    if data.dtype == np.float64 or data.dtype == np.float32:
-        # Convert float to uint16 for better TIFF compatibility
-        # Normalize to 0-65535 range
-        data_min = np.min(data)
-        data_max = np.max(data)
-        if data_max > data_min:
-            data_normalized = (data - data_min) / (data_max - data_min)
-            data_uint16 = (data_normalized * 65535).astype(np.uint16)
-        else:
-            data_uint16 = np.zeros_like(data, dtype=np.uint16)
-        image = Image.fromarray(data_uint16)
+    if np.issubdtype(data.dtype, np.floating):
+        tifffile.imwrite(filename, data.astype(np.float32))
     else:
-        # For integer types, use as-is
-        image = Image.fromarray(data)
-
-    image.save(str(filename))
+        tifffile.imwrite(filename, data)
 
 
 def load_fits(filename: Union[str, Path]) -> NDArray[np.float64]:
@@ -202,7 +194,8 @@ def load_fits(filename: Union[str, Path]) -> NDArray[np.float64]:
     FileNotFoundError
         If the specified file does not exist.
     ValueError
-        If the FITS file does not contain valid image data.
+        If the FITS file does not contain valid image data, or the data
+        is not a single 2D image after squeezing singleton dimensions.
 
     Examples
     --------
@@ -213,7 +206,10 @@ def load_fits(filename: Union[str, Path]) -> NDArray[np.float64]:
     Notes
     -----
     This function loads the primary HDU data from the FITS file.
-    For multi-HDU FITS files, only the first HDU is loaded.
+    For multi-HDU FITS files, only the first HDU is loaded. Singleton
+    dimensions (e.g. a (1, H, W) cube) are squeezed away; anything that
+    is not a single 2D image afterwards is rejected, enforcing the
+    documented return contract.
     """
     if not HAS_ASTROPY:
         raise ImportError("astropy is required for FITS file operations. Install it with: pip install astropy")
@@ -231,7 +227,10 @@ def load_fits(filename: Union[str, Path]) -> NDArray[np.float64]:
         if hdu.data is None:
             raise ValueError(f"No data found in primary HDU of {filename}")
 
-        image = np.asarray(hdu.data, dtype=np.float64)
+        image = np.squeeze(np.asarray(hdu.data, dtype=np.float64))
+
+    if image.ndim != 2:
+        raise ValueError(f"{filename} does not contain a single 2D image (shape after squeezing: {image.shape})")
 
     return image
 
@@ -253,9 +252,12 @@ def load_tiff(filename: Union[str, Path]) -> NDArray[np.float64]:
     Raises
     ------
     ImportError
-        If neither matplotlib nor PIL/Pillow is installed.
+        If tifffile is not installed.
     FileNotFoundError
         If the specified file does not exist.
+    ValueError
+        If the file is not a single 2D image after squeezing singleton
+        dimensions.
 
     Examples
     --------
@@ -265,30 +267,25 @@ def load_tiff(filename: Union[str, Path]) -> NDArray[np.float64]:
 
     Notes
     -----
-    This function attempts to use matplotlib.image.imread first,
-    falling back to PIL if matplotlib is not available.
-    The returned array is always converted to float64.
+    The file is read with tifffile and the returned array is always
+    converted to float64. Earlier versions read through
+    matplotlib.image.imread, which returns an RGBA uint8 render — not
+    the pixel data — for float (mode 'F') TIFFs.
     """
+    if not HAS_TIFFFILE:
+        raise ImportError("tifffile is required for TIFF file operations. Install it with: pip install tifffile")
+
     filename = Path(filename)
 
     if not filename.exists():
         raise FileNotFoundError(f"File {filename} not found")
 
-    if HAS_MATPLOTLIB:
-        # Use matplotlib if available
-        image = mpimg.imread(str(filename))
-    elif HAS_PIL:
-        # Fall back to PIL
-        with Image.open(filename) as img:
-            image = np.array(img)
-    else:
-        raise ImportError(
-            "Either matplotlib or Pillow is required for TIFF file operations. "
-            "Install with: pip install matplotlib or pip install Pillow"
-        )
+    image = np.squeeze(np.asarray(tifffile.imread(str(filename)), dtype=np.float64))
 
-    # Ensure consistent float64 output
-    return np.asarray(image, dtype=np.float64)
+    if image.ndim != 2:
+        raise ValueError(f"{filename} does not contain a single 2D image (shape after squeezing: {image.shape})")
+
+    return image
 
 
 def get_supported_formats() -> dict[str, bool]:
@@ -307,10 +304,10 @@ def get_supported_formats() -> dict[str, bool]:
     >>> if formats['fits']:
     ...     print("FITS support is available")
     """
-    return {"fits": HAS_ASTROPY, "tiff": HAS_MATPLOTLIB or HAS_PIL}
+    return {"fits": HAS_ASTROPY, "tiff": HAS_TIFFFILE}
 
 
-def validate_image_data(data: NDArray) -> None:
+def validate_image_data(data: NDArray, allow_nan: bool = False) -> None:
     """
     Validate that data is suitable for image I/O operations.
 
@@ -318,6 +315,10 @@ def validate_image_data(data: NDArray) -> None:
     ----------
     data : ndarray
         Array to validate.
+    allow_nan : bool, optional
+        Whether to accept non-finite values (NaN/inf). Default is False,
+        preserving the historical strictness for direct callers; the
+        writers pass True because FITS and float TIFF store NaN natively.
 
     Raises
     ------
@@ -341,5 +342,5 @@ def validate_image_data(data: NDArray) -> None:
     if data.size == 0:
         raise ValueError("Data array is empty")
 
-    if not np.isfinite(data).all():
+    if not allow_nan and not np.isfinite(data).all():
         raise ValueError("Data contains non-finite values (inf or nan)")
