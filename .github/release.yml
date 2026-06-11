@@ -1,0 +1,13 @@
+# Exclude bot PRs from auto-generated release notes
+# github-actions[bot] is excluded on top of the template list: the
+# update-lockfiles/update-pre-commit workflows author their PRs with the
+# repo GITHUB_TOKEN, so they appear under that login
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - dependabot
+      - dependabot[bot]
+      - pre-commit-ci[bot]
+      - github-actions[bot]
