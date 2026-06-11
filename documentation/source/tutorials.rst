@@ -2,7 +2,8 @@ Tutorials
 =========
 
 The following tutorials demonstrate how to use the neutron-geomcorr package for cylindrical geometry correction.
-All notebooks are committed with executed outputs, so they can be browsed on GitHub without running anything.
+The tutorial notebooks are committed with executed outputs, so they can be browsed on GitHub without running
+anything (development notebooks under ``notebooks/dev_*`` are kept output-free by convention).
 
 Step-by-step series (FITS)
 --------------------------
