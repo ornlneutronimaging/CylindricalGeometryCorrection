@@ -265,12 +265,11 @@ class TestRun:
         o_cgc.load_files(notebook=True)
         assert len(o_cgc.list_data) == 1
 
-    def test_run_loads_and_defines_parameters(self, homogeneous_tiff_files):
-        """assert run() loads data and stores the geometry parameters
+    def test_run_loads_defines_parameters_and_corrects(self, homogeneous_tiff_files):
+        """assert run() performs the full load + define + correct pipeline
 
-        Characterization: run() currently does NOT apply the correction even
-        though its docstring says it does (tracked for the correctness PR);
-        this test pins what run() actually does today.
+        Previously run() silently skipped the correction step despite its
+        docstring; list_data_corrected stayed empty.
         """
         o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files)
         o_cgc.run(pixel_center=256, outer_radius=200)
@@ -278,7 +277,117 @@ class TestRun:
         assert len(o_cgc.list_data) == len(homogeneous_tiff_files)
         assert o_cgc.pixel_center == 256
         assert o_cgc.outer_radius == 200
-        # run() does NOT apply the correction today; when the correctness fix
-        # makes run() call correct() (matching its docstring), this assertion
-        # must flip to assert the corrected data exists
-        assert o_cgc.list_data_corrected == []
+        assert len(o_cgc.list_data_corrected) == len(homogeneous_tiff_files)
+        assert o_cgc.list_data_corrected[0].shape == (512, 2 * 200 - 1)
+
+
+class TestValidation:
+    """Regression tests for the correctness batch (audit M2-M5, L1-L3)."""
+
+    def test_correct_requires_loaded_data(self, homogeneous_tiff_files):
+        """M5: correct() before load_files() must raise, not silently no-op"""
+        o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files)
+        with pytest.raises(AttributeError, match="load_files"):
+            o_cgc.correct()
+
+    def test_correct_requires_defined_parameters(self, homogeneous_tiff_files):
+        """M5: correct() after load but before define_parameters() must raise
+        a descriptive error instead of an opaque TypeError from slicing"""
+        o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files)
+        o_cgc.load_files()
+        with pytest.raises(AttributeError, match="define_parameters"):
+            o_cgc.correct()
+
+    def test_failed_define_parameters_does_not_unlock_correct(self, homogeneous_tiff_files):
+        """M5: a define_parameters() call that raises must leave correct() locked"""
+        o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files)
+        o_cgc.load_files()
+        with pytest.raises(ValueError):
+            o_cgc.define_parameters(pixel_center=256, outer_radius=800)
+        with pytest.raises(AttributeError, match="define_parameters"):
+            o_cgc.correct()
+
+    def test_zero_wall_thickness_rejected(self, homogeneous_tiff_files):
+        """M3: inner_radius == outer_radius (zero wall) must raise instead of
+        producing NaN/inf garbage downstream"""
+        o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files)
+        o_cgc.load_files()
+        with pytest.raises(ValueError, match="zero wall thickness"):
+            o_cgc.define_parameters(pixel_center=256, outer_radius=100, inner_radius=100)
+
+        # same guard on the outer_radius setter (hollow state already defined)
+        o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files)
+        o_cgc.load_files()
+        o_cgc.define_parameters(pixel_center=256, outer_radius=120, inner_radius=100)
+        with pytest.raises(ValueError, match="zero wall thickness"):
+            o_cgc.outer_radius = 100
+
+    def test_inner_radius_requires_outer_radius_first(self, homogeneous_tiff_files):
+        """M4: setting inner_radius while outer_radius is unset previously
+        swap-assigned the value as the OUTER radius — silently a solid cylinder"""
+        o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files)
+        o_cgc.load_files()
+        o_cgc.pixel_center = 256
+        with pytest.raises(ValueError, match="outer_radius first"):
+            o_cgc.inner_radius = 100
+        # the failed assignment must not have corrupted the geometry
+        assert np.isnan(o_cgc.outer_radius)
+        assert np.isnan(o_cgc.inner_radius)
+
+    def test_numpy_integers_accepted(self, homogeneous_tiff_files):
+        """L3: np.int64 (natural output of argmax/center-of-mass) must pass
+        the integer validation on all three geometry setters"""
+        o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files)
+        o_cgc.load_files()
+        o_cgc.define_parameters(
+            pixel_center=np.int64(256),
+            outer_radius=np.int64(200),
+            inner_radius=np.int64(150),
+        )
+        assert o_cgc.pixel_center == 256
+        assert o_cgc.outer_radius == 200
+        assert o_cgc.inner_radius == 150
+
+    def test_booleans_rejected_as_integers(self, homogeneous_tiff_files):
+        """L3: True passes isinstance(_, int) but is not a valid pixel index"""
+        o_cgc = GeometryCorrection(list_files=homogeneous_tiff_files)
+        o_cgc.load_files()
+        with pytest.raises(ValueError, match="integer"):
+            o_cgc.define_parameters(pixel_center=True)
+
+    def test_empty_file_list_raises_on_load(self):
+        """L1: an empty list_files previously sailed through load_files() and
+        crashed later in define_parameters with an unrelated error"""
+        o_cgc = GeometryCorrection(list_files=[])
+        with pytest.raises(OSError, match="empty"):
+            o_cgc.load_files()
+
+    def test_default_constructor_works(self):
+        """L2: GeometryCorrection() previously raised TypeError despite the
+        documented 'Default is empty list'"""
+        o_cgc = GeometryCorrection()
+        assert o_cgc.list_files == []
+
+    def test_instances_do_not_share_state(self, homogeneous_tiff_files):
+        """M1 hazard: list_data/list_data_corrected were class-level lists
+        shared across instances"""
+        a = GeometryCorrection(list_files=homogeneous_tiff_files)
+        a.load_files()
+        b = GeometryCorrection()
+        assert b.list_data == []
+        assert b.list_data is not a.list_data
+        assert b.list_data_corrected is not a.list_data_corrected
+
+    def test_homogeneous_correction_edge_symmetry(self):
+        """M2: the correction factor must behave identically at both tangent
+        edges; sin(arccos(-1.0)) == 1.2e-16 previously made x=-R return a
+        finite 8e15 while x=+R returned NaN"""
+        assert np.isnan(GeometryCorrection.homogeneous_correction(x=200, radius=200))
+        assert np.isnan(GeometryCorrection.homogeneous_correction(x=-200, radius=200))
+        assert GeometryCorrection.homogeneous_correction(x=201, radius=200) == 0
+        assert GeometryCorrection.homogeneous_correction(x=-201, radius=200) == 0
+        assert GeometryCorrection.homogeneous_correction(x=0, radius=200) == 1
+        # interior values stay finite and mirror-symmetric
+        left = GeometryCorrection.homogeneous_correction(x=-199, radius=200)
+        right = GeometryCorrection.homogeneous_correction(x=199, radius=200)
+        assert np.isfinite(left) and left == pytest.approx(right)
