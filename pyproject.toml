@@ -5,7 +5,8 @@
 name = "neutron-geomcorr"
 description = "Neutron imaging geometric correction for cylindrical samples"
 dynamic = ["version"]
-requires-python = ">=3.10"
+# SPEC 0 (scientific-python support window); org policy decided 2026-06-10
+requires-python = ">=3.12"
 license = { text = "BSD" }
 keywords = [
   "neutron",
@@ -129,6 +130,17 @@ pydantic = ">=2.11.7,<3"
 pybaselines = ">=1.2.1,<2"
 loguru = ">=0.7.3,<0.8"
 pre-commit = ">=4.3.0,<5"
+# CVE floors for transitive dependencies already in the tree (template-aligned);
+# keeps the grype gate quiet by staying above known-fixed advisories
+h2 = ">=4.3.0"               # Known vulnerability in <4.3.0
+brotli = ">=1.2.0"
+urllib3 = ">=2.6.3"          # Known vulnerability in <2.6.3
+filelock = ">=3.20.3"        # Known vulnerability in <3.20.3
+virtualenv = ">=20.36.1,<21" # Known vulnerability in <20.36.1; capped due to https://github.com/pypa/hatch/issues/2193
+cryptography = ">=46.0.7"    # CVE-2026-26007, CVE-2026-39892
+requests = ">=2.33.0"        # CVE-2026-25645
+pillow = ">=12.2.0"          # CVE-2026-25990, CVE-2026-40192
+openssl = ">=3.6.3"          # CVE-2026-34182 (critical) + 8 high fixed in 3.6.3
 
 [tool.pixi.pypi-dependencies]
 # PyPI dependencies, including this package to allow local editable installs
@@ -139,11 +151,11 @@ neutron-geomcorr = { path = ".", editable = true }
 [tool.pixi.package.host-dependencies]
 hatchling = "*"
 versioningit = "*"
-python = ">=3.10"
+python = ">=3.12"
 setuptools = "*"   # Required for conda package building
 
 [tool.pixi.package.run-dependencies]
-python = ">=3.10"
+python = ">=3.12"
 numpy = "*"
 tifffile = "*"
 astropy = "*"
@@ -154,7 +166,9 @@ name = "neutron-geomcorr"
 version = "0.0.0"         # placeholder, overwritten by sync-version
 
 [tool.pixi.package.build]
-backend = { name = "pixi-build-python", version = "0.1.*" }
+# template-aligned: the 0.1.* pin predates pixi's build-API negotiation and
+# fails against current pixi ("does not depend on pixi-build-api-version")
+backend = { name = "pixi-build-python", version = "*" }
 
 # Environments and Features
 
@@ -167,9 +181,23 @@ default = { features = [
   "jupyter",
 ], solve-group = "default" }
 jupyter = { features = ["developer", "jupyter"], solve-group = "jupyter" }
+# per-version test environments: the CI matrix tests real interpreter
+# versions instead of relabeling the single default-env resolution
+py312 = { features = ["test", "py312"], solve-group = "py312" }
+py313 = { features = ["test", "py313"], solve-group = "py313" }
+py314 = { features = ["test", "py314"], solve-group = "py314" }
+
+[tool.pixi.feature.py312.dependencies]
+python = "3.12.*"
+
+[tool.pixi.feature.py313.dependencies]
+python = "3.13.*"
+
+[tool.pixi.feature.py314.dependencies]
+python = "3.14.*"
 
 [tool.pixi.feature.test.dependencies]
-pytest = "*"
+pytest = ">=9.0.3"  # CVE-2025-71176 fixed in 9.0.3
 pytest-cov = "*"
 pytest-repeat = "*"
 pytest-xdist = "*"
@@ -184,8 +212,7 @@ hatch = "*"
 toml-cli = "*"
 
 [tool.pixi.feature.developer.dependencies]
-pip = "*"
-pip-audit = "*"
+pip = ">=26.0"     # CVE-2026-1703
 pre-commit = "*"
 ruff = "*"
 versioningit = "*"
@@ -227,7 +254,8 @@ conda-publish = { cmd = "pixi upload anaconda --owner neutronimaging *.conda", d
   "conda-build",
 ] }
 # Misc
-audit-deps = { cmd = "pip-audit --local -s osv", description = "Audit the package dependencies for vulnerabilities" }
+# (audit-deps/pip-audit removed: grype gates dependency CVEs in CI per the
+# 2026-06-10 decision memo — scans the installed env, only-fixed, SARIF)
 clean = { cmd = 'rm -rf .pytest_cache .ruff_cache **/*.egg-info **/dist **/__pycache__', description = "Clean up various caches and build artifacts" }
 clean-conda = { cmd = "rm -f *.conda", description = "Clean the local .conda build artifacts" }
 clean-docs = { cmd = "rm -rf documentation/_build", description = "Clean up documentation build artifacts" }
@@ -265,7 +293,7 @@ norecursedirs = [
 ############
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py312"
 line-length = 120
 exclude = ["notebooks/**", "**/*.ipynb"]
 

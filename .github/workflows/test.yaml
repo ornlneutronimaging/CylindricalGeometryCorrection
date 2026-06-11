@@ -7,6 +7,9 @@ on:
     branches: [next, main]
     tags: ["v*"]
 
+permissions:
+  contents: read
+
 # cancel previous job if new commit is pushed
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,9 +20,12 @@ jobs:
     name: Unit tests
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12"]
+        # real per-version pixi environments (SPEC 0 window); the previous
+        # python-version matrix relabeled the same default-env resolution
+        environment: [py312, py313, py314]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -31,24 +37,31 @@ jobs:
         uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
         with:
           manifest-path: pyproject.toml
-          environments: default
+          environments: ${{ matrix.environment }}
 
       - name: Run unit tests
-        run: pixi run test
+        run: pixi run -e ${{ matrix.environment }} test
 
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
         if: |
           github.actor != 'dependabot[bot]' &&
           matrix.os == 'ubuntu-latest' &&
-          matrix.python-version == '3.11'
+          matrix.environment == 'py312'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
-  dependency-check:
-    name: Dependency audit
+  # replaces the advisory-only pip-audit job: grype scans the *installed*
+  # pixi env (pip + conda packages), gates only on fixable findings, and
+  # uploads SARIF to the Security tab (decision memo 2026-06-10)
+  dependency-scan:
+    name: Scan dependencies with Grype
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # required for upload-sarif
+      actions: read # upload-sarif on private repos
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -59,7 +72,10 @@ jobs:
           manifest-path: pyproject.toml
           environments: default
 
-      - name: Dependency check
-        run: |
-          pixi run audit-deps
-        continue-on-error: true  # Allow audit to fail for known issues
+      - name: Scan pixi environment with Grype
+        uses: neutrons/conda-actions/grype@bba9ca89d48d9ae846db9650cc63fde736340b3d # v2
+        with:
+          path: ${{ github.workspace }}/.pixi/envs/default
+          # real gate: only-fixed defaults to true in the v2 wrapper, so
+          # unfixable advisories never fail the build
+          fail-build: true
