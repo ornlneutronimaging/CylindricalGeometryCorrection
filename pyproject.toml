@@ -140,6 +140,7 @@ virtualenv = ">=20.36.1,<21" # Known vulnerability in <20.36.1; capped due to ht
 cryptography = ">=46.0.7"    # CVE-2026-26007, CVE-2026-39892
 requests = ">=2.33.0"        # CVE-2026-25645
 pillow = ">=12.2.0"          # CVE-2026-25990, CVE-2026-40192
+openssl = ">=3.6.3"          # CVE-2026-34182 (critical) + 8 high fixed in 3.6.3
 
 [tool.pixi.pypi-dependencies]
 # PyPI dependencies, including this package to allow local editable installs
