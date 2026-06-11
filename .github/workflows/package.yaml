@@ -1,0 +1,141 @@
+name: Package and Deployment
+
+# conda-build runs on every PR/push so the packaging pipeline stays
+# continuously validated; the publish jobs only fire on release tags.
+# NOTE: GitHub cannot express needs: across workflow files, so the publish
+# jobs gate on this pipeline, not on the Unit Tests workflow — tags are
+# expected to be cut from a green branch.
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [next, main]
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+env:
+  PKG_NAME: neutron-geomcorr
+  MODULE_NAME: neutron_geomcorr
+
+# cancel previous job if new commit is pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  conda-build:
+    name: Build conda package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # for the grype SARIF upload
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
+        with:
+          manifest-path: pyproject.toml
+          environments: default
+
+      - name: Build conda package
+        run: |
+          pixi run conda-build
+          mkdir -p /tmp/local-channel/linux-64
+          cp *.conda /tmp/local-channel/linux-64
+
+      # pkg-verify requires a conda env that already has the package
+      # installed (and micromamba on PATH); pkg-install sets both up.
+      - name: Install built conda package
+        id: install
+        uses: neutrons/conda-actions/pkg-install@bba9ca89d48d9ae846db9650cc63fde736340b3d # v2
+        with:
+          package-name: ${{ env.PKG_NAME }}
+          local-channel: /tmp/local-channel
+
+      - name: Verify conda package
+        uses: neutrons/conda-actions/pkg-verify@bba9ca89d48d9ae846db9650cc63fde736340b3d # v2
+        with:
+          package-name: ${{ env.PKG_NAME }}
+          module-name: ${{ env.MODULE_NAME }}
+          conda-env-name: ${{ steps.install.outputs.conda_env }}
+
+      # audit the dependencies of the conda package we just installed;
+      # fail-build defaults to "false" in the wrapper — set it so this scan
+      # gates like the Unit Tests workflow's dependency-scan job
+      - name: Scan installed environment with Grype
+        uses: neutrons/conda-actions/grype@bba9ca89d48d9ae846db9650cc63fde736340b3d # v2
+        with:
+          path: ${{ steps.install.outputs.conda_install_dir }}
+          fail-build: true
+
+      - name: Upload conda package as artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: artifact-conda-package
+          path: ${{ env.PKG_NAME }}-*.conda
+
+  publish:
+    name: Upload package to anaconda
+    runs-on: ubuntu-latest
+    needs: [conda-build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      # same-run artifact downloads use the runner's runtime token, but this
+      # job only executes on release tags — explicit read is cheap insurance
+      # on a path that stays unexercised until then
+      actions: read
+    steps:
+      - name: Download conda package artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: artifact-conda-package
+
+      # README documents `conda install -c neutronimaging neutron-geomcorr`;
+      # requires the ANACONDA_TOKEN repo secret (org decision: neutronimaging
+      # channel, not neutrons)
+      - name: Upload package to anaconda
+        uses: neutrons/conda-actions/publish@bba9ca89d48d9ae846db9650cc63fde736340b3d # v2
+        with:
+          anaconda-token: ${{ secrets.ANACONDA_TOKEN }}
+          organization: neutronimaging
+          package-path: ${{ env.PKG_NAME }}-*.conda
+
+  pypi-publish:
+    name: Upload release to PyPI
+    runs-on: ubuntu-latest
+    needs: [conda-build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      # job-level permissions replace the workflow block, so checkout's
+      # read access must be restated here
+      contents: read
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
+        with:
+          manifest-path: pyproject.toml
+          environments: default
+
+      - name: Build pypi package
+        run: pixi run pypi-build
+
+      # needs the PyPI project + trusted publisher configured first
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
