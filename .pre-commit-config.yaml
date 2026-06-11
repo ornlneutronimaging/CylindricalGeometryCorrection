@@ -4,10 +4,10 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
-        # largest legitimate additions are ~1 MB image fixtures and executed
-        # tutorial notebooks (~400 KB); the old 30 MB cap existed only to
-        # accommodate a dev notebook whose outputs are now stripped
-        args: [--maxkb=2000]
+        # committed notebooks carry executed outputs by repo convention (they
+        # are read on GitHub without an environment); the largest legitimate
+        # file is the executed dev_elaborate notebook at ~26 MB
+        args: [--maxkb=30000]
       - id: check-json
       - id: check-merge-conflict
       - id: check-toml

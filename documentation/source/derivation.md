@@ -1,14 +1,10 @@
 # Cylindrical Geometry Correction for Transmission Data
 
 ```{important}
-**Status: design document, not yet implemented.** This page derives the
-Beer-Lambert (exponential) correction with per-TOF μ estimation. The
-correction currently implemented in `neutron_geomcorr` is a **linear
-chord-length division** (see {doc}`introduction`), which is valid only for
-inputs proportional to path length (attenuation, −ln(T), or thickness maps)
-— not for raw transmission data. Reconciling the two — implementing this
-derivation or re-scoping the package documentation — is tracked in
-[issue #57](https://github.com/ornlneutronimaging/CylindricalGeometryCorrection/issues/57).
+**Status: design document, not yet implemented.**
+This page derives the Beer-Lambert (exponential) correction with per-TOF μ estimation.
+The correction currently implemented in `neutron_geomcorr` is a **linear chord-length division** (see {doc}`introduction`), which is valid only for inputs proportional to path length (attenuation, −ln(T), or thickness maps) — not for raw transmission data.
+Reconciling the two — implementing this derivation or re-scoping the package documentation — is tracked in [issue #57](https://github.com/ornlneutronimaging/CylindricalGeometryCorrection/issues/57).
 The algorithm below is prototyped in `notebooks/00_development.ipynb`.
 ```
 
