@@ -141,6 +141,8 @@ cryptography = ">=46.0.7"    # CVE-2026-26007, CVE-2026-39892
 requests = ">=2.33.0"        # CVE-2026-25645
 pillow = ">=12.2.0"          # CVE-2026-25990, CVE-2026-40192
 openssl = ">=3.6.3"          # CVE-2026-34182 (critical) + 8 high fixed in 3.6.3
+jupyter_server = ">=2.20.0"  # GHSA-fcw5-x6j4-ccmp (critical)
+jupyterlab = ">=4.5.9"       # GHSA-vmhf-c436-hxj4
 
 [tool.pixi.pypi-dependencies]
 # PyPI dependencies, including this package to allow local editable installs
