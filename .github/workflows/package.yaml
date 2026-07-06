@@ -48,8 +48,9 @@ jobs:
       - name: Build conda package
         run: |
           pixi run conda-build
-          mkdir -p /tmp/local-channel/linux-64
-          cp *.conda /tmp/local-channel/linux-64
+          # pixi publish writes the package into ./local-channel/<subdir>/;
+          # copy it to the workspace root for pkg-install and the artifact upload.
+          find local-channel -name "*.conda" -exec cp {} . \;
 
       # pkg-verify requires a conda env that already has the package
       # installed (and micromamba on PATH); pkg-install sets both up.
@@ -58,7 +59,7 @@ jobs:
         uses: neutrons/conda-actions/pkg-install@bba9ca89d48d9ae846db9650cc63fde736340b3d # v2
         with:
           package-name: ${{ env.PKG_NAME }}
-          local-channel: /tmp/local-channel
+          local-channel: ./local-channel
 
       - name: Verify conda package
         uses: neutrons/conda-actions/pkg-verify@bba9ca89d48d9ae846db9650cc63fde736340b3d # v2
