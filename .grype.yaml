@@ -35,12 +35,24 @@ ignore:
   - vulnerability: CVE-2026-7774
     package:
       name: python
-  # Added 2026-07: the Grype vuln DB now flags this on cpython 3.14.6; the fix
-  # is only in the CPython 3.15.0b3 prerelease, with no stable 3.14 backport on
-  # conda-forge yet. Remove when a stable fix lands (lockfile-update picks it up).
+  # Added 2026-07: the Grype vuln DB now flags these on cpython 3.14.6; the fix
+  # is only in the CPython 3.15.x prerelease line, with no stable 3.14 backport
+  # on conda-forge yet (newest conda-forge build is 3.14.6). Remove when a stable
+  # fix lands (lockfile-update picks it up).
   - vulnerability: CVE-2026-12003
     package:
       name: python
+  - vulnerability: CVE-2026-15308 # HIGH: fixed in 3.15.0, no stable 3.14 backport
+    package:
+      name: python
+
+  # Added 2026-07-13: Grype flags pydantic 2.13.4 (the newest conda-forge build,
+  # 2026-05-06); the fix is in pydantic 2.14.2, which is not yet packaged on
+  # conda-forge (verified: conda-forge/noarch tops out at 2.13.4). Remove once
+  # conda-forge ships pydantic >= 2.14.2 — the lockfile-update workflow picks it up.
+  - vulnerability: CVE-2026-58203 # MEDIUM: fixed in 2.14.2, not yet on conda-forge
+    package:
+      name: pydantic
 
   # Rust crates statically linked into transitively-pulled conda packages.
   # grype catalogs them from the compiled binaries, but CGC cannot remediate
