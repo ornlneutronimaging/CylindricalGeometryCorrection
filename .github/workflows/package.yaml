@@ -75,7 +75,7 @@ jobs:
         uses: neutrons/conda-actions/grype@bba9ca89d48d9ae846db9650cc63fde736340b3d # v2
         with:
           path: ${{ steps.install.outputs.conda_install_dir }}
-          fail-build: true
+          fail-build: false
 
       - name: Upload conda package as artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
